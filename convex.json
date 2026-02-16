@@ -1,0 +1,8 @@
+{
+  "project": "buitenzijnapp",
+  "team": "buitenzijn-vzw",
+  "prodUrl": "https://focused-eel-679.eu-west-1.convex.cloud",
+  "node": {
+    "externalPackages": ["nodemailer"]
+  }
+}

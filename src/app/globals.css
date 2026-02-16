@@ -1,0 +1,299 @@
+@import "tailwindcss";
+
+:root {
+  /* Background & Foreground */
+  --background: #f5f3e8;
+  --foreground: #212121;
+
+  /* ==========================================
+     PRIMARY COLORS
+     ========================================== */
+
+  /* Green - Main primary */
+  --green-50: #edf7ed;
+  --green-100: #d4edd3;
+  --green-200: #b0dfae;
+  --green-300: #8ad088;
+  --green-400: #6bc468;
+  --green-500: #4eb54a;
+  --green-600: #45a342;
+  --green-700: #3a8f39;
+  --green-800: #2f7a2f;
+  --green-900: #1f5c1f;
+
+  /* Blue - Main primary */
+  --blue-50: #e8f1f9;
+  --blue-100: #c5dbef;
+  --blue-200: #9fc4e4;
+  --blue-300: #78acd9;
+  --blue-400: #5a9ad0;
+  --blue-500: #186db7;
+  --blue-600: #1562a5;
+  --blue-700: #115490;
+  --blue-800: #0d467a;
+  --blue-900: #083459;
+
+  /* ==========================================
+     COMPLEMENTARY COLORS
+     ========================================== */
+
+  /* Orange - Complement to green */
+  --orange-50: #fdf3e8;
+  --orange-100: #fadfc5;
+  --orange-200: #f5c89e;
+  --orange-300: #f0b076;
+  --orange-400: #eb9c54;
+  --orange-500: #e07a1f;
+  --orange-600: #c96e1c;
+  --orange-700: #af5f18;
+  --orange-800: #945014;
+  --orange-900: #6e3b0f;
+
+  /* Rust Red - Complement to blue */
+  --rust-50: #f9e8ea;
+  --rust-100: #efc5c9;
+  --rust-200: #e49da4;
+  --rust-300: #d8747e;
+  --rust-400: #cf5562;
+  --rust-500: #b71d2e;
+  --rust-600: #a51a29;
+  --rust-700: #901624;
+  --rust-800: #7a131e;
+  --rust-900: #5c0e17;
+
+  /* ==========================================
+     ANALOGOUS COLORS
+     ========================================== */
+
+  /* Teal - Pairs with green */
+  --teal-50: #e9f9f5;
+  --teal-100: #c8f0e5;
+  --teal-200: #a3e5d3;
+  --teal-300: #7ddac1;
+  --teal-400: #60d1b2;
+  --teal-500: #48c4a3;
+  --teal-600: #40b093;
+  --teal-700: #379a80;
+  --teal-800: #2e836d;
+  --teal-900: #226352;
+
+  /* Purple - Pairs with blue */
+  --purple-50: #efedf9;
+  --purple-100: #d6d1ef;
+  --purple-200: #bab2e4;
+  --purple-300: #9e93d9;
+  --purple-400: #887bd0;
+  --purple-500: #6955c6;
+  --purple-600: #5f4db2;
+  --purple-700: #52429c;
+  --purple-800: #453885;
+  --purple-900: #332a64;
+
+  /* ==========================================
+     NEUTRAL TONES
+     ========================================== */
+
+  /* Beige - Background/neutral */
+  --beige-50: #fdfcfa;
+  --beige-100: #faf9f4;
+  --beige-200: #f5f3e8;
+  --beige-300: #ebe8d9;
+  --beige-400: #dfdbc8;
+  --beige-500: #d2cdb7;
+  --beige-600: #b8b39f;
+  --beige-700: #9a9684;
+  --beige-800: #7a776a;
+  --beige-900: #5a574f;
+
+  /* Gray - Neutral for balance */
+  --gray-50: #f7f7f7;
+  --gray-100: #ededed;
+  --gray-200: #dfdfdf;
+  --gray-300: #cccccc;
+  --gray-400: #a8a8a8;
+  --gray-500: #8f8f8f;
+  --gray-600: #6e6e6e;
+  --gray-700: #545454;
+  --gray-800: #3a3a3a;
+  --gray-900: #212121;
+
+  /* ==========================================
+     ACCENT COLORS
+     ========================================== */
+
+  /* Yellow - Adds vibrancy */
+  --yellow-50: #fef9e6;
+  --yellow-100: #fcf0bf;
+  --yellow-200: #fae794;
+  --yellow-300: #f7dd69;
+  --yellow-400: #f5d548;
+  --yellow-500: #f1c40f;
+  --yellow-600: #d9b00e;
+  --yellow-700: #be9a0c;
+  --yellow-800: #a1830a;
+  --yellow-900: #776107;
+
+  /* Navy - Darker shade for contrast */
+  --navy-50: #e6edf2;
+  --navy-100: #c1d2de;
+  --navy-200: #97b4c8;
+  --navy-300: #6d96b2;
+  --navy-400: #4d7fa1;
+  --navy-500: #2d688f;
+  --navy-600: #1e5777;
+  --navy-700: #144663;
+  --navy-800: #0b3954;
+  --navy-900: #072839;
+
+  /* ==========================================
+     SEMANTIC COLORS
+     ========================================== */
+  --success: #4eb54a;
+  --warning: #f1c40f;
+  --error: #b71d2e;
+  --info: #186db7;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* Primary */
+  --color-green-50: var(--green-50);
+  --color-green-100: var(--green-100);
+  --color-green-200: var(--green-200);
+  --color-green-300: var(--green-300);
+  --color-green-400: var(--green-400);
+  --color-green-500: var(--green-500);
+  --color-green-600: var(--green-600);
+  --color-green-700: var(--green-700);
+  --color-green-800: var(--green-800);
+  --color-green-900: var(--green-900);
+
+  --color-blue-50: var(--blue-50);
+  --color-blue-100: var(--blue-100);
+  --color-blue-200: var(--blue-200);
+  --color-blue-300: var(--blue-300);
+  --color-blue-400: var(--blue-400);
+  --color-blue-500: var(--blue-500);
+  --color-blue-600: var(--blue-600);
+  --color-blue-700: var(--blue-700);
+  --color-blue-800: var(--blue-800);
+  --color-blue-900: var(--blue-900);
+
+  /* Complementary */
+  --color-orange-50: var(--orange-50);
+  --color-orange-100: var(--orange-100);
+  --color-orange-200: var(--orange-200);
+  --color-orange-300: var(--orange-300);
+  --color-orange-400: var(--orange-400);
+  --color-orange-500: var(--orange-500);
+  --color-orange-600: var(--orange-600);
+  --color-orange-700: var(--orange-700);
+  --color-orange-800: var(--orange-800);
+  --color-orange-900: var(--orange-900);
+
+  --color-rust-50: var(--rust-50);
+  --color-rust-100: var(--rust-100);
+  --color-rust-200: var(--rust-200);
+  --color-rust-300: var(--rust-300);
+  --color-rust-400: var(--rust-400);
+  --color-rust-500: var(--rust-500);
+  --color-rust-600: var(--rust-600);
+  --color-rust-700: var(--rust-700);
+  --color-rust-800: var(--rust-800);
+  --color-rust-900: var(--rust-900);
+
+  /* Analogous */
+  --color-teal-50: var(--teal-50);
+  --color-teal-100: var(--teal-100);
+  --color-teal-200: var(--teal-200);
+  --color-teal-300: var(--teal-300);
+  --color-teal-400: var(--teal-400);
+  --color-teal-500: var(--teal-500);
+  --color-teal-600: var(--teal-600);
+  --color-teal-700: var(--teal-700);
+  --color-teal-800: var(--teal-800);
+  --color-teal-900: var(--teal-900);
+
+  --color-purple-50: var(--purple-50);
+  --color-purple-100: var(--purple-100);
+  --color-purple-200: var(--purple-200);
+  --color-purple-300: var(--purple-300);
+  --color-purple-400: var(--purple-400);
+  --color-purple-500: var(--purple-500);
+  --color-purple-600: var(--purple-600);
+  --color-purple-700: var(--purple-700);
+  --color-purple-800: var(--purple-800);
+  --color-purple-900: var(--purple-900);
+
+  /* Neutrals */
+  --color-beige-50: var(--beige-50);
+  --color-beige-100: var(--beige-100);
+  --color-beige-200: var(--beige-200);
+  --color-beige-300: var(--beige-300);
+  --color-beige-400: var(--beige-400);
+  --color-beige-500: var(--beige-500);
+  --color-beige-600: var(--beige-600);
+  --color-beige-700: var(--beige-700);
+  --color-beige-800: var(--beige-800);
+  --color-beige-900: var(--beige-900);
+
+  --color-gray-50: var(--gray-50);
+  --color-gray-100: var(--gray-100);
+  --color-gray-200: var(--gray-200);
+  --color-gray-300: var(--gray-300);
+  --color-gray-400: var(--gray-400);
+  --color-gray-500: var(--gray-500);
+  --color-gray-600: var(--gray-600);
+  --color-gray-700: var(--gray-700);
+  --color-gray-800: var(--gray-800);
+  --color-gray-900: var(--gray-900);
+
+  /* Accents */
+  --color-yellow-50: var(--yellow-50);
+  --color-yellow-100: var(--yellow-100);
+  --color-yellow-200: var(--yellow-200);
+  --color-yellow-300: var(--yellow-300);
+  --color-yellow-400: var(--yellow-400);
+  --color-yellow-500: var(--yellow-500);
+  --color-yellow-600: var(--yellow-600);
+  --color-yellow-700: var(--yellow-700);
+  --color-yellow-800: var(--yellow-800);
+  --color-yellow-900: var(--yellow-900);
+
+  --color-navy-50: var(--navy-50);
+  --color-navy-100: var(--navy-100);
+  --color-navy-200: var(--navy-200);
+  --color-navy-300: var(--navy-300);
+  --color-navy-400: var(--navy-400);
+  --color-navy-500: var(--navy-500);
+  --color-navy-600: var(--navy-600);
+  --color-navy-700: var(--navy-700);
+  --color-navy-800: var(--navy-800);
+  --color-navy-900: var(--navy-900);
+
+  /* Semantic */
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-info: var(--info);
+
+  /* Fonts */
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-poppins), var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), "Fira Code", monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0b3954;
+    --foreground: #f5f3e8;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
