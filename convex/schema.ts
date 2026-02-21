@@ -28,7 +28,12 @@ export default defineSchema({
     phone: v.optional(v.string()),
 
     // Organization role
-    role: v.union(v.literal("admin"), v.literal("member"), v.literal("guest")),
+    role: v.union(
+      v.literal("admin"),
+      v.literal("member"),
+      v.literal("guest"),
+      v.literal("lijndans"),
+    ),
 
     // Status
     isActive: v.boolean(),
