@@ -1,6 +1,13 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Wachtwoord resetten - BuitenZijn",
@@ -17,7 +24,11 @@ export default function ResetPasswordPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ResetPasswordForm />
+        <Suspense
+          fallback={<p className="text-gray-500 text-center">Laden...</p>}
+        >
+          <ResetPasswordForm />
+        </Suspense>
       </CardContent>
     </Card>
   );

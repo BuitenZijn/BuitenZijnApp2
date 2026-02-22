@@ -1,11 +1,19 @@
 "use client";
 
-import { ConvexProvider, ConvexReactClient } from "convex/react";
-import { ReactNode, createContext, useContext, useState, useEffect } from "react";
+import { ConvexProvider, ConvexReactClient, useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 
 /**
  * BuitenZijn App - Providers
- * 
+ *
  * This file sets up the Convex client and auth context.
  */
 
@@ -23,7 +31,7 @@ interface User {
   firstName?: string;
   lastName?: string;
   avatarUrl?: string;
-  role: "admin" | "member" | "guest";
+  role: "admin" | "member" | "guest" | "lijndans";
   emailVerified: boolean;
 }
 
@@ -52,41 +60,65 @@ export function useAuth() {
 
 function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [sessionToken, setSessionToken] = useState<string | null>(null);
+  const [sessionToken, setSessionToken] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("session_token");
+    }
+    return null;
+  });
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check for existing session on mount
-  useEffect(() => {
-    const token = localStorage.getItem("session_token");
-    const storedUser = localStorage.getItem("user");
-    
-    if (token && storedUser) {
-      try {
-        setSessionToken(token);
-        setUser(JSON.parse(storedUser));
-      } catch {
-        // Invalid stored data, clear it
-        localStorage.removeItem("session_token");
-        localStorage.removeItem("user");
-      }
-    }
-    
-    setIsLoading(false);
-  }, []);
+  // Validate session with Convex — this reactively updates when the token changes
+  const sessionData = useQuery(
+    api.auth.validateSession,
+    sessionToken ? { token: sessionToken } : "skip",
+  );
 
-  const login = (token: string, userData: User) => {
+  // When session validation completes, update user state
+  useEffect(() => {
+    // Still waiting for the query to return
+    if (sessionToken && sessionData === undefined) return;
+
+    if (sessionData && sessionData.user) {
+      const freshUser: User = {
+        id: sessionData.user._id,
+        email: sessionData.user.email,
+        name: sessionData.user.name,
+        firstName: sessionData.user.firstName,
+        lastName: sessionData.user.lastName,
+        avatarUrl: sessionData.user.avatarUrl,
+        role: sessionData.user.role as User["role"],
+        emailVerified: sessionData.user.emailVerified,
+      };
+      setUser(freshUser);
+      localStorage.setItem("user", JSON.stringify(freshUser));
+    } else if (sessionToken && sessionData === null) {
+      // Session is invalid or expired — clear everything
+      localStorage.removeItem("session_token");
+      localStorage.removeItem("user");
+      setSessionToken(null);
+      setUser(null);
+    } else if (!sessionToken) {
+      // No token at all
+      setUser(null);
+    }
+
+    setIsLoading(false);
+  }, [sessionData, sessionToken]);
+
+  const login = useCallback((token: string, userData: User) => {
     localStorage.setItem("session_token", token);
     localStorage.setItem("user", JSON.stringify(userData));
     setSessionToken(token);
     setUser(userData);
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem("session_token");
     localStorage.removeItem("user");
     setSessionToken(null);
     setUser(null);
-  };
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -111,9 +143,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <ConvexProvider client={convex}>
-      <AuthProvider>
-        {children}
-      </AuthProvider>
+      <AuthProvider>{children}</AuthProvider>
     </ConvexProvider>
   );
 }

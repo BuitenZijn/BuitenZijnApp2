@@ -1,20 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui";
 import { Button } from "@/components/ui";
 import Link from "next/link";
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
-  
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+
+  const [status, setStatus] = useState<"loading" | "success" | "error">(
+    "loading",
+  );
   const [message, setMessage] = useState("");
-  
+
   const verifyEmail = useMutation(api.auth.verifyEmail);
 
   useEffect(() => {
@@ -32,9 +40,9 @@ export default function VerifyEmailPage() {
       } catch (error) {
         setStatus("error");
         setMessage(
-          error instanceof Error 
-            ? error.message 
-            : "Er is iets misgegaan bij het verifiëren van je e-mailadres"
+          error instanceof Error
+            ? error.message
+            : "Er is iets misgegaan bij het verifiëren van je e-mailadres",
         );
       }
     }
@@ -122,12 +130,55 @@ export default function VerifyEmailPage() {
               </div>
               <p className="text-gray-600">{message}</p>
               <Link href="/login">
-                <Button variant="outline" fullWidth>Terug naar inloggen</Button>
+                <Button variant="outline" fullWidth>
+                  Terug naar inloggen
+                </Button>
               </Link>
             </div>
           )}
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense
+      fallback={
+        <Card>
+          <CardHeader>
+            <CardTitle>E-mail verificatie</CardTitle>
+            <CardDescription>Bezig met verifiëren...</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-center">
+              <svg
+                className="animate-spin h-8 w-8 text-green-500"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+            </div>
+          </CardContent>
+        </Card>
+      }
+    >
+      <VerifyEmailContent />
+    </Suspense>
   );
 }

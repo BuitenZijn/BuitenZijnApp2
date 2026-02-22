@@ -40,15 +40,23 @@ export function LoginForm() {
         return;
       }
 
-      // Store session and redirect
+      // Store session — stay on current page
       login(result.sessionToken!, {
-        id: "",
-        email,
-        role: "member",
-        emailVerified: false,
+        id: result.user!.id,
+        email: result.user!.email,
+        name: result.user!.name,
+        firstName: result.user!.firstName,
+        lastName: result.user!.lastName,
+        role: result.user!.role as "admin" | "member" | "guest" | "lijndans",
+        emailVerified: result.user!.emailVerified,
       });
 
-      router.push("/dashboard");
+      // Go back to the page the user came from, or home
+      if (window.history.length > 1) {
+        router.back();
+      } else {
+        router.push("/");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Er is iets misgegaan");
     } finally {

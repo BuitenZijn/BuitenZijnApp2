@@ -97,18 +97,17 @@ export default defineSchema({
   // ==========================================
 
   linedances_dances: defineTable({
-    dance_id: v.string(),
     lesson_period: v.string(),
-    lesson_year: v.string(),
+    lesson_year: v.number(),
     dance_name: v.string(),
-    song_artist: v.string(),
+    song_artist: v.optional(v.string()),
     song_name: v.string(),
     video_url: v.string(),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
-    .index("by_dance_id", ["dance_id"])
-    .index("by_lesson_period_year", ["lesson_period", "lesson_year"]),
+    .index("by_lesson_period_year", ["lesson_period", "lesson_year"])
+    .index("by_dance_name", ["dance_name"]),
 
   // ==========================================
   // GRAVITY GRAB
@@ -126,34 +125,15 @@ export default defineSchema({
     .index("by_timestamp", ["timestamp"]),
 
   // ==========================================
-  // ADD YOUR FUTURE TABLES BELOW
+  // CONTACT MESSAGES
   // ==========================================
-  // Example: Activities table
-  // activities: defineTable({
-  //   title: v.string(),
-  //   description: v.string(),
-  //   date: v.number(),
-  //   location: v.optional(v.string()),
-  //   maxParticipants: v.optional(v.number()),
-  //   createdBy: v.id("users"),
-  //   createdAt: v.number(),
-  //   updatedAt: v.number(),
-  // })
-  //   .index("by_date", ["date"])
-  //   .index("by_creator", ["createdBy"]),
-
-  // Example: Members table
-  // members: defineTable({
-  //   userId: v.id("users"),
-  //   membershipType: v.union(
-  //     v.literal("regular"),
-  //     v.literal("premium"),
-  //     v.literal("family")
-  //   ),
-  //   joinedAt: v.number(),
-  //   expiresAt: v.optional(v.number()),
-  //   isActive: v.boolean(),
-  // })
-  //   .index("by_user", ["userId"])
-  //   .index("by_type", ["membershipType"]),
+  contactMessages: defineTable({
+    name: v.string(),
+    email: v.string(),
+    message: v.string(),
+    read: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_createdAt", ["createdAt"])
+    .index("by_read", ["read"]),
 });

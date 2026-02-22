@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter, Poppins, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import { Header, Footer } from "@/components/layout";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -38,13 +37,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${poppins.variable} ${jetbrainsMono.variable} antialiased`}
       >
-        <Providers>
-          {/* Header */}
-          <Header />
-          {children}
-          {/* Footer */}
-          <Footer />
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

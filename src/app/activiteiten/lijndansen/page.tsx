@@ -24,7 +24,7 @@ export default function LijndansenPage() {
           <div className="flex items-center gap-2 text-green-700 font-medium">
             <ArrowTopRightOnSquareIcon className="w-5 h-5" />
             <Link
-              href="/activiteiten/lijndansen/beheer"
+              href="/activiteiten/lijndansen/dances"
               className="underline hover:text-green-900"
             >
               Ga naar het lesmateriaal

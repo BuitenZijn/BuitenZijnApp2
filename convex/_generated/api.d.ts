@@ -10,7 +10,10 @@
 
 import type * as auth from "../auth.js";
 import type * as authActions from "../authActions.js";
+import type * as contact from "../contact.js";
 import type * as email from "../email.js";
+import type * as lijndances from "../lijndances.js";
+import type * as populate_lijndances from "../populate_lijndances.js";
 import type * as users from "../users.js";
 
 import type {
@@ -22,7 +25,10 @@ import type {
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   authActions: typeof authActions;
+  contact: typeof contact;
   email: typeof email;
+  lijndances: typeof lijndances;
+  populate_lijndances: typeof populate_lijndances;
   users: typeof users;
 }>;
 

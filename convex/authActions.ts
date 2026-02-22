@@ -63,7 +63,20 @@ export const secureLogin = action({
     ctx,
     args,
   ): Promise<
-    { success: true; sessionToken: string } | { success: false; error: string }
+    | {
+        success: true;
+        sessionToken: string;
+        user: {
+          id: string;
+          email: string;
+          name?: string;
+          firstName?: string;
+          lastName?: string;
+          role: string;
+          emailVerified: boolean;
+        };
+      }
+    | { success: false; error: string }
   > => {
     const user: any = await ctx.runQuery(
       internal.auth.internalGetUserWithPassword,
@@ -100,7 +113,19 @@ export const secureLogin = action({
       userId: user._id,
     });
 
-    return { success: true, sessionToken };
+    return {
+      success: true,
+      sessionToken,
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        emailVerified: user.emailVerified,
+      },
+    };
   },
 });
 

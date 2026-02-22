@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { Button } from "@/components/ui";
+import { Navbar } from "@/components/layout/Navbar";
+import { UpcomingEvents } from "@/components/home/UpcomingEvents";
 
 export const metadata: Metadata = {
   title: "BuitenZijn - Samen buiten zijn",
@@ -10,138 +11,163 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-beige-200">
-      {/* Header */}
-      <header className="py-4 px-6">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">B</span>
-            </div>
-            <span className="text-xl font-bold text-navy-800">BuitenZijn</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="/login">
-              <Button variant="ghost">Inloggen</Button>
-            </Link>
-            <Link href="/register">
-              <Button>Registreren</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      {/* Navbar */}
+      <Navbar />
 
-      {/* Hero section */}
-      <main className="py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl font-bold text-navy-800 mb-6">
-            Samen <span className="text-green-500">buiten</span> zijn
+      {/* Hero: Welcome message over video */}
+      <section className="relative aspect-video w-full overflow-hidden bg-black">
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          autoPlay
+          muted
+          loop
+          playsInline
+        >
+          <source src="/buitenzijn_banner.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-black/40" />
+        <div className="relative z-10 flex items-center justify-center h-full px-6">
+          <h1 className="text-4xl md:text-6xl font-extrabold text-white text-center drop-shadow-lg leading-tight max-w-4xl">
+            Welkom op de website van{" "}
+            <span className="text-green-400">VZW BuitenZijn</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Ontdek de natuur samen met onze VZW. Word lid en neem deel aan
-            wandelingen, fietstochten en andere buitenactiviteiten in je buurt.
-          </p>
-          <div className="flex items-center justify-center gap-4">
-            <Link href="/register">
-              <Button size="lg">Word lid</Button>
-            </Link>
-            <Link href="/login">
-              <Button variant="outline" size="lg">
-                Al lid? Log in
-              </Button>
-            </Link>
+        </div>
+      </section>
+
+      <main>
+        {/* Onze Missie */}
+        <section className="py-20 px-6 bg-white">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-navy-800 text-center mb-12">
+              Onze Missie
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Missie card 1 */}
+              <div className="bg-beige-100 rounded-2xl overflow-hidden shadow-md">
+                <div className="h-48 bg-green-200 flex items-center justify-center">
+                  <svg
+                    className="w-16 h-16 text-green-600/50"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                    />
+                  </svg>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-navy-800 mb-2">
+                    Behoud en Promotie Lokale Natuur
+                  </h3>
+                  <p className="text-gray-600">
+                    VZW BuitenZijn zet zich in voor het behoud en promotie van
+                    de lokale natuur.
+                  </p>
+                </div>
+              </div>
+
+              {/* Missie card 2 */}
+              <div className="bg-beige-100 rounded-2xl overflow-hidden shadow-md">
+                <div className="h-48 bg-blue-200 flex items-center justify-center">
+                  <svg
+                    className="w-16 h-16 text-blue-600/50"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                    />
+                  </svg>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-navy-800 mb-2">
+                    Welzijn Lokale Bevolking
+                  </h3>
+                  <p className="text-gray-600">
+                    VZW BuitenZijn zet zich in voor het fysieke en mentale
+                    welzijn van de lokale bevolking door het organiseren van
+                    sportieve en leuke activiteiten.
+                  </p>
+                </div>
+              </div>
+
+              {/* Missie card 3 */}
+              <div className="bg-beige-100 rounded-2xl overflow-hidden shadow-md">
+                <div className="h-48 bg-yellow-200 flex items-center justify-center">
+                  <svg
+                    className="w-16 h-16 text-yellow-600/50"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                    />
+                  </svg>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-navy-800 mb-2">
+                    Stimuleren Lokale Cultuur
+                  </h3>
+                  <p className="text-gray-600">
+                    VZW BuitenZijn zet zich in voor het stimuleren van de lokale
+                    cultuur.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
+        </section>
+
+        {/* Separator */}
+        <div className="max-w-4xl mx-auto px-6">
+          <hr className="border-beige-300" />
         </div>
 
-        {/* Features */}
-        <div className="max-w-6xl mx-auto mt-24 grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Gemeenschap card clickable */}
-          <Link href="#" className="block">
-            <div className="bg-white rounded-xl p-6 shadow-md text-center cursor-pointer hover:shadow-lg transition">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Gemeenschap
-              </h3>
-              <p className="text-gray-600">
-                Maak deel uit van een actieve gemeenschap van natuurliefhebbers.
-              </p>
-            </div>
-          </Link>
+        {/* Activiteiten — Upcoming Events */}
+        <section className="py-20 px-6 bg-beige-200">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-navy-800 text-center mb-4">
+              Activiteiten
+            </h2>
+            <p className="text-gray-600 text-center mb-10">
+              Bekijk onze aankomende evenementen
+            </p>
 
-          {/* Activiteiten card clickable and links to activiteiten page */}
-          <Link href="/activiteiten" className="block">
-            <div className="bg-white rounded-xl p-6 shadow-md text-center cursor-pointer hover:shadow-lg transition">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Activiteiten
-              </h3>
-              <p className="text-gray-600">
-                Regelmatige wandelingen, fietstochten en andere
-                buitenactiviteiten.
-              </p>
-            </div>
-          </Link>
+            <UpcomingEvents />
 
-          {/* Natuur card clickable */}
-          <Link href="#" className="block">
-            <div className="bg-white rounded-xl p-6 shadow-md text-center cursor-pointer hover:shadow-lg transition">
-              <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-teal-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Natuur
-              </h3>
-              <p className="text-gray-600">
-                Ontdek de mooiste plekjes in de natuur met ervaren gidsen.
-              </p>
+            <div className="mt-10 text-center">
+              <Link
+                href="/activiteiten"
+                className="inline-block px-6 py-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors"
+              >
+                Alle activiteiten bekijken
+              </Link>
             </div>
-          </Link>
-        </div>
+          </div>
+        </section>
       </main>
 
       {/* Footer */}
-      <footer className="py-8 px-6 border-t border-beige-300">
-        <div className="max-w-7xl mx-auto text-center text-gray-500 text-sm">
-          <p>
+      <footer className="py-10 px-6 border-t border-beige-300 bg-white">
+        <div className="max-w-7xl mx-auto flex flex-col items-center gap-4">
+          <img
+            src="/buitenzijn_logo_color.png"
+            alt="BuitenZijn"
+            className="h-12 w-auto"
+          />
+          <p className="text-gray-500 text-sm">
             &copy; {new Date().getFullYear()} VZW BuitenZijn. Alle rechten
             voorbehouden.
           </p>
