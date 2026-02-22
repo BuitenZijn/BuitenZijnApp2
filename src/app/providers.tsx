@@ -31,7 +31,7 @@ interface User {
   firstName?: string;
   lastName?: string;
   avatarUrl?: string;
-  roles: ("admin" | "member" | "guest" | "lijndans")[];
+  roles: ("admin" | "member" | "guest" | "lijndans" | "ella")[];
   emailVerified: boolean;
 }
 

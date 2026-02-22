@@ -72,7 +72,7 @@ export const secureLogin = action({
           name?: string;
           firstName?: string;
           lastName?: string;
-          role: string;
+          roles: string[];
           emailVerified: boolean;
         };
       }
@@ -122,7 +122,7 @@ export const secureLogin = action({
         name: user.name,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role,
+        roles: user.roles ?? (user.role ? [user.role] : ["member"]),
         emailVerified: user.emailVerified,
       },
     };

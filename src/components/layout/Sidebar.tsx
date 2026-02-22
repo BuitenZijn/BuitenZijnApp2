@@ -33,6 +33,7 @@ const adminNavigation = [
   { name: "Gebruikers", href: "/dashboard/admin/users", icon: UserGroupIcon },
   { name: "Credits", href: "/dashboard/admin/credits", icon: CreditCardIcon },
   { name: "Sessies", href: "/dashboard/admin/sessions", icon: QrCodeIcon },
+  { name: "ELLA", href: "/dashboard/admin/ella", icon: TicketIcon },
 ];
 
 export function Sidebar() {

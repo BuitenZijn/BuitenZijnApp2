@@ -6,7 +6,7 @@ import { api } from "../../../../../../convex/_generated/api";
 import { useAuth } from "@/app/providers";
 import { Id } from "../../../../../../convex/_generated/dataModel";
 
-type RoleType = "admin" | "member" | "guest" | "lijndans";
+type RoleType = "admin" | "member" | "guest" | "lijndans" | "ella";
 
 type User = {
   id: Id<"users">;
@@ -38,6 +38,7 @@ const ALL_ROLES: { value: RoleType; label: string }[] = [
   { value: "member", label: "Lid" },
   { value: "guest", label: "Gast" },
   { value: "lijndans", label: "Lijndans" },
+  { value: "ella", label: "Ella" },
 ];
 
 const ROLE_LABELS: Record<string, string> = {
@@ -45,6 +46,7 @@ const ROLE_LABELS: Record<string, string> = {
   member: "Lid",
   guest: "Gast",
   lijndans: "Lijndans",
+  ella: "Ella",
 };
 
 const ROLE_COLORS: Record<string, string> = {
@@ -52,6 +54,7 @@ const ROLE_COLORS: Record<string, string> = {
   member: "bg-green-100 text-green-800",
   guest: "bg-gray-100 text-gray-800",
   lijndans: "bg-blue-100 text-blue-800",
+  ella: "bg-pink-100 text-pink-800",
 };
 
 export default function AdminUsersPage() {
@@ -222,6 +225,7 @@ export default function AdminUsersPage() {
           <option value="member">Lid</option>
           <option value="guest">Gast</option>
           <option value="lijndans">Lijndans</option>
+          <option value="ella">Ella</option>
         </select>
         <select
           value={statusFilter}

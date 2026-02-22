@@ -47,7 +47,13 @@ export function LoginForm() {
         name: result.user!.name,
         firstName: result.user!.firstName,
         lastName: result.user!.lastName,
-        role: result.user!.role as "admin" | "member" | "guest" | "lijndans",
+        roles: result.user!.roles as (
+          | "admin"
+          | "member"
+          | "guest"
+          | "lijndans"
+          | "ella"
+        )[],
         emailVerified: result.user!.emailVerified,
       });
 

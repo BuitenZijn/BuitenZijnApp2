@@ -183,7 +183,7 @@ export function Navbar() {
                     <div className="px-4 py-2 border-b border-gray-100">
                       <p className="text-xs text-gray-500">{user?.email}</p>
                       <p className="text-xs text-gray-400 capitalize">
-                        {user?.role}
+                        {user?.roles?.join(", ") ?? "guest"}
                       </p>
                     </div>
                     <Link

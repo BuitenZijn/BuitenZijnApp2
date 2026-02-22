@@ -34,6 +34,7 @@ export default defineSchema({
         v.literal("member"),
         v.literal("guest"),
         v.literal("lijndans"),
+        v.literal("ella"),
       ),
     ),
     roles: v.optional(
@@ -43,6 +44,7 @@ export default defineSchema({
           v.literal("member"),
           v.literal("guest"),
           v.literal("lijndans"),
+          v.literal("ella"),
         ),
       ),
     ),
@@ -216,4 +218,27 @@ export default defineSchema({
     .index("by_sessionId", ["sessionId"])
     .index("by_userId", ["userId"])
     .index("by_session_user", ["sessionId", "userId"]),
+
+  // ==========================================
+  // ELLA: Knutselen (crafts) videos
+  // ==========================================
+  knutselen: defineTable({
+    categorie: v.union(
+      v.literal("tekenen"),
+      v.literal("vouwen"),
+      v.literal("schilderen"),
+      v.literal("verven"),
+      v.literal("slijm maken"),
+      v.literal("boetseren"),
+      v.literal("stempelen"),
+    ),
+    titel: v.string(),
+    youtube_url: v.string(),
+    beschrijving: v.optional(v.string()),
+    thumbnail: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_categorie", ["categorie"])
+    .index("by_createdAt", ["createdAt"]),
 });
