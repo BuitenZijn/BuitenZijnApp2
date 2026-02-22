@@ -362,7 +362,7 @@ export default function LijndansenBeheerPage() {
   const addDance = useMutation(api.lijndances.addDance);
   const updateDance = useMutation(api.lijndances.updateDance);
 
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.roles?.includes("admin") ?? false;
 
   // Sort handler
   const handleSort = useCallback(
@@ -413,7 +413,7 @@ export default function LijndansenBeheerPage() {
   // Only allow access for lijndans or admin role
   if (
     !isAuthenticated ||
-    !(user?.role === "admin" || user?.role === "lijndans")
+    !(user?.roles?.includes("admin") || user?.roles?.includes("lijndans"))
   ) {
     return (
       <div className="min-h-screen flex items-center justify-center">

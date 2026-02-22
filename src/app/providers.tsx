@@ -31,7 +31,7 @@ interface User {
   firstName?: string;
   lastName?: string;
   avatarUrl?: string;
-  role: "admin" | "member" | "guest" | "lijndans";
+  roles: ("admin" | "member" | "guest" | "lijndans")[];
   emailVerified: boolean;
 }
 
@@ -87,7 +87,11 @@ function AuthProvider({ children }: { children: ReactNode }) {
         firstName: sessionData.user.firstName,
         lastName: sessionData.user.lastName,
         avatarUrl: sessionData.user.avatarUrl,
-        role: sessionData.user.role as User["role"],
+        roles:
+          (sessionData.user as any).roles ??
+          ((sessionData.user as any).role
+            ? [(sessionData.user as any).role]
+            : ["member"]),
         emailVerified: sessionData.user.emailVerified,
       };
       setUser(freshUser);

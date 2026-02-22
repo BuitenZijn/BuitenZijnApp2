@@ -11,9 +11,18 @@
 import type * as auth from "../auth.js";
 import type * as authActions from "../authActions.js";
 import type * as contact from "../contact.js";
+import type * as creditPackages from "../creditPackages.js";
+import type * as danceCheckins from "../danceCheckins.js";
+import type * as danceCredits from "../danceCredits.js";
+import type * as danceSessions from "../danceSessions.js";
 import type * as email from "../email.js";
+import type * as http from "../http.js";
 import type * as lijndances from "../lijndances.js";
+import type * as migrateRoles from "../migrateRoles.js";
 import type * as populate_lijndances from "../populate_lijndances.js";
+import type * as seedCreditPackages from "../seedCreditPackages.js";
+import type * as stripe from "../stripe.js";
+import type * as stripeHelpers from "../stripeHelpers.js";
 import type * as users from "../users.js";
 
 import type {
@@ -26,9 +35,18 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   authActions: typeof authActions;
   contact: typeof contact;
+  creditPackages: typeof creditPackages;
+  danceCheckins: typeof danceCheckins;
+  danceCredits: typeof danceCredits;
+  danceSessions: typeof danceSessions;
   email: typeof email;
+  http: typeof http;
   lijndances: typeof lijndances;
+  migrateRoles: typeof migrateRoles;
   populate_lijndances: typeof populate_lijndances;
+  seedCreditPackages: typeof seedCreditPackages;
+  stripe: typeof stripe;
+  stripeHelpers: typeof stripeHelpers;
   users: typeof users;
 }>;
 

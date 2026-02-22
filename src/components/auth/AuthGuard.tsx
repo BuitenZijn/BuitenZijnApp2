@@ -6,7 +6,7 @@ import { useAuth } from "@/app/providers";
 
 /**
  * Auth Guard Component
- * 
+ *
  * Protects routes that require authentication.
  * Redirects to login if user is not authenticated.
  */
@@ -24,7 +24,7 @@ export function AuthGuard({ children, requireAdmin = false }: AuthGuardProps) {
     if (!isLoading) {
       if (!isAuthenticated) {
         router.push("/login");
-      } else if (requireAdmin && user?.role !== "admin") {
+      } else if (requireAdmin && !user?.roles?.includes("admin")) {
         router.push("/dashboard");
       }
     }
@@ -67,7 +67,7 @@ export function AuthGuard({ children, requireAdmin = false }: AuthGuardProps) {
   }
 
   // Don't render admin content if not admin
-  if (requireAdmin && user?.role !== "admin") {
+  if (requireAdmin && !user?.roles?.includes("admin")) {
     return null;
   }
 
