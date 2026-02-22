@@ -30,6 +30,14 @@ const quizEditions = [
     iconColor: "text-purple-600",
     description: "De nieuwste editie! Test je kennis en daag je vrienden uit.",
   },
+  {
+    year: 2026,
+    color: "from-orange-500 to-red-600",
+    iconBg: "bg-orange-100",
+    iconColor: "text-orange-600",
+    description:
+      "De editie van dit jaar! Nieuwe vragen, nieuwe uitdagingen. Doe je mee?",
+  },
 ];
 
 export default function QuizPage() {
@@ -48,7 +56,7 @@ export default function QuizPage() {
         </div>
 
         {/* Quiz cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {quizEditions.map((quiz) => (
             <Link
               key={quiz.year}
