@@ -12,6 +12,7 @@ import {
   CreditCardIcon,
   TicketIcon,
   QrCodeIcon,
+  MusicalNoteIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth } from "@/app/providers";
 
@@ -31,9 +32,23 @@ const navigation = [
 
 const adminNavigation = [
   { name: "Gebruikers", href: "/dashboard/admin/users", icon: UserGroupIcon },
-  { name: "Credits", href: "/dashboard/admin/credits", icon: CreditCardIcon },
-  { name: "Sessies", href: "/dashboard/admin/sessions", icon: QrCodeIcon },
-  { name: "ELLA", href: "/dashboard/admin/ella", icon: TicketIcon },
+];
+
+const linedanceNavigation = [
+  {
+    name: "Danskrediet",
+    href: "/dashboard/admin/linedance/credits",
+    icon: CreditCardIcon,
+  },
+  {
+    name: "Sessies",
+    href: "/dashboard/admin/linedance/sessions",
+    icon: QrCodeIcon,
+  },
+];
+
+const ellaNavigation = [
+  { name: "Knutselen", href: "/dashboard/admin/ella", icon: TicketIcon },
 ];
 
 export function Sidebar() {
@@ -78,33 +93,93 @@ export function Sidebar() {
 
         {/* Admin section */}
         {user?.roles?.includes("admin") && (
-          <div className="pt-6">
-            <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Beheer
-            </h3>
-            <div className="mt-2 space-y-1">
-              {adminNavigation.map((item) => {
-                const isActive =
-                  pathname === item.href ||
-                  pathname.startsWith(item.href + "/");
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={clsx(
-                      "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                      isActive
-                        ? "bg-blue-50 text-blue-700"
-                        : "text-gray-700 hover:bg-gray-100",
-                    )}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    {item.name}
-                  </Link>
-                );
-              })}
+          <>
+            <div className="pt-6">
+              <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Beheer
+              </h3>
+              <div className="mt-2 space-y-1">
+                {adminNavigation.map((item) => {
+                  const isActive =
+                    pathname === item.href ||
+                    pathname.startsWith(item.href + "/");
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={clsx(
+                        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                        isActive
+                          ? "bg-blue-50 text-blue-700"
+                          : "text-gray-700 hover:bg-gray-100",
+                      )}
+                    >
+                      <item.icon className="w-5 h-5" />
+                      {item.name}
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+
+            {/* Lijndans sub-section */}
+            <div className="pt-4">
+              <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                💃 Lijndans
+              </h3>
+              <div className="mt-2 space-y-1">
+                {linedanceNavigation.map((item) => {
+                  const isActive =
+                    pathname === item.href ||
+                    pathname.startsWith(item.href + "/");
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={clsx(
+                        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                        isActive
+                          ? "bg-green-50 text-green-700"
+                          : "text-gray-700 hover:bg-gray-100",
+                      )}
+                    >
+                      <item.icon className="w-5 h-5" />
+                      {item.name}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* ELLA sub-section */}
+            <div className="pt-4">
+              <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                🎀 ELLA
+              </h3>
+              <div className="mt-2 space-y-1">
+                {ellaNavigation.map((item) => {
+                  const isActive =
+                    pathname === item.href ||
+                    pathname.startsWith(item.href + "/");
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={clsx(
+                        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                        isActive
+                          ? "bg-pink-50 text-pink-700"
+                          : "text-gray-700 hover:bg-gray-100",
+                      )}
+                    >
+                      <item.icon className="w-5 h-5" />
+                      {item.name}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </>
         )}
       </nav>
 

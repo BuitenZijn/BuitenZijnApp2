@@ -76,7 +76,7 @@ export default function AdminEllaPage() {
     try {
       if (editId) {
         await updateVideo({
-          id: editId as Id<"knutselen">,
+          id: editId as Id<"ella_knutselen">,
           categorie: form.categorie,
           titel: form.titel.trim(),
           youtube_url: form.youtube_url.trim(),
@@ -115,7 +115,7 @@ export default function AdminEllaPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      await removeVideo({ id: id as Id<"knutselen"> });
+      await removeVideo({ id: id as Id<"ella_knutselen"> });
       setDeleteConfirm(null);
     } catch (err: any) {
       alert(err.message || "Er ging iets mis");

@@ -271,7 +271,7 @@ export const populateLijndances = mutation(async (ctx) => {
   const now = Date.now();
 
   for (const dance of dancesData) {
-    await ctx.db.insert("linedances_dances", {
+    await ctx.db.insert("linedance_dances", {
       lesson_period: dance.lesson_period,
       lesson_year: dance.lesson_year,
       dance_name: dance.dance_name,

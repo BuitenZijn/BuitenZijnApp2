@@ -20,7 +20,7 @@ import Stripe from "stripe";
 export const createCheckoutSession = action({
   args: {
     userId: v.id("users"),
-    packageId: v.id("credit_packages"),
+    packageId: v.id("linedance_credit_packages"),
   },
   handler: async (
     ctx,
@@ -59,7 +59,7 @@ export const createCheckoutSession = action({
             currency: "eur",
             product_data: {
               name: pkg.name,
-              description: `${pkg.credits} danscredit${pkg.credits > 1 ? "s" : ""} voor lijndansen`,
+              description: `${pkg.credits} danskrediet${pkg.credits > 1 ? "en" : ""} voor lijndansen`,
             },
             unit_amount: pkg.priceInCents,
           },

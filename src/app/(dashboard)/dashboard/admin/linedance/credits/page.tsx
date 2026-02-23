@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../../../../convex/_generated/api";
+import { api } from "../../../../../../../convex/_generated/api";
 import { useAuth } from "@/app/providers";
-import { Id } from "../../../../../../convex/_generated/dataModel";
+import { Id } from "../../../../../../../convex/_generated/dataModel";
 
 export default function AdminCreditsPage() {
   const { user } = useAuth();
@@ -13,6 +13,7 @@ export default function AdminCreditsPage() {
   const [creditNote, setCreditNote] = useState("");
   const [action, setAction] = useState<"add" | "remove">("add");
   const [showPackageForm, setShowPackageForm] = useState(false);
+  const [userFilter, setUserFilter] = useState<"credits" | "all">("all");
   const [newPkg, setNewPkg] = useState({
     name: "",
     credits: 1,
@@ -20,6 +21,7 @@ export default function AdminCreditsPage() {
   });
 
   const balances = useQuery(api.danceCredits.getAllBalances);
+  const allLijndansUsers = useQuery(api.danceCredits.getAllLijndansUsers);
   const purchases = useQuery(api.danceCredits.getAllPurchases, { limit: 100 });
   const packages = useQuery(api.creditPackages.listAll);
 
@@ -27,6 +29,12 @@ export default function AdminCreditsPage() {
   const removeCredits = useMutation(api.danceCredits.removeCredits);
   const createPackage = useMutation(api.creditPackages.create);
   const updatePackage = useMutation(api.creditPackages.update);
+
+  // Choose which list to display based on filter
+  const displayedUsers =
+    userFilter === "all"
+      ? allLijndansUsers
+      : balances?.filter((b) => b.balance > 0);
 
   if (!user?.roles?.includes("admin")) {
     return <div className="text-center py-12 text-gray-500">Geen toegang</div>;
@@ -93,24 +101,32 @@ export default function AdminCreditsPage() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Credits Beheer</h1>
+        <h1 className="text-2xl font-bold text-gray-900">
+          💃 Danskrediet Beheer
+        </h1>
         <p className="text-gray-600">
-          Overzicht van alle credits, pakketten en transacties
+          Overzicht van alle danskrediet, pakketten en transacties voor lijndans
         </p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <p className="text-sm text-gray-500">Totaal uitstaande credits</p>
+          <p className="text-sm text-gray-500">Totaal uitstaand krediet</p>
           <p className="text-3xl font-bold text-green-700">
             {balances?.reduce((sum, b) => sum + b.balance, 0) ?? 0}
           </p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <p className="text-sm text-gray-500">Gebruikers met credits</p>
+          <p className="text-sm text-gray-500">Gebruikers met krediet</p>
           <p className="text-3xl font-bold text-blue-700">
             {balances?.filter((b) => b.balance > 0).length ?? 0}
+          </p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <p className="text-sm text-gray-500">Lijndansers totaal</p>
+          <p className="text-3xl font-bold text-purple-700">
+            {allLijndansUsers?.length ?? 0}
           </p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6">
@@ -121,10 +137,12 @@ export default function AdminCreditsPage() {
         </div>
       </div>
 
-      {/* Credit Packages */}
+      {/* Danskrediet Pakketten */}
       <div className="bg-white rounded-xl border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Pakketten</h2>
+          <h2 className="text-lg font-semibold text-gray-900">
+            Danskrediet Pakketten
+          </h2>
           <button
             onClick={() => setShowPackageForm(!showPackageForm)}
             className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition"
@@ -149,7 +167,7 @@ export default function AdminCreditsPage() {
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">
-                Credits
+                Krediet
               </label>
               <input
                 type="number"
@@ -200,7 +218,7 @@ export default function AdminCreditsPage() {
               <div>
                 <span className="font-medium text-gray-900">{pkg.name}</span>
                 <span className="ml-2 text-sm text-gray-500">
-                  {pkg.credits} credit{pkg.credits > 1 ? "s" : ""} —{" "}
+                  {pkg.credits} krediet{pkg.credits > 1 ? "en" : ""} —{" "}
                   {formatPrice(pkg.priceInCents)}
                 </span>
               </div>
@@ -226,10 +244,33 @@ export default function AdminCreditsPage() {
 
       {/* User Balances */}
       <div className="bg-white rounded-xl border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">
-            Credits per Gebruiker
+            Danskrediet per Gebruiker
           </h2>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-500">Toon:</span>
+            <button
+              onClick={() => setUserFilter("all")}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                userFilter === "all"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              Alle lijndansers
+            </button>
+            <button
+              onClick={() => setUserFilter("credits")}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                userFilter === "credits"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              Met krediet
+            </button>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -242,10 +283,10 @@ export default function AdminCreditsPage() {
                   Email
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Rol
+                  Rollen
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                  Credits
+                  Krediet
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
                   Acties
@@ -253,7 +294,7 @@ export default function AdminCreditsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {balances?.map((b) => (
+              {displayedUsers?.map((b) => (
                 <tr key={b.userId} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm text-gray-900">
                     {b.userName}
@@ -262,9 +303,22 @@ export default function AdminCreditsPage() {
                     {b.userEmail}
                   </td>
                   <td className="px-6 py-4">
-                    <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-                      {b.userRole}
-                    </span>
+                    <div className="flex gap-1 flex-wrap">
+                      {(b.userRoles ?? [b.userRole]).map((role: string) => (
+                        <span
+                          key={role}
+                          className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                            role === "lijndans"
+                              ? "bg-green-100 text-green-700"
+                              : role === "admin"
+                                ? "bg-blue-100 text-blue-700"
+                                : "bg-gray-100 text-gray-600"
+                          }`}
+                        >
+                          {role}
+                        </span>
+                      ))}
+                    </div>
                   </td>
                   <td className="px-6 py-4 text-right">
                     <span
@@ -297,13 +351,15 @@ export default function AdminCreditsPage() {
                   </td>
                 </tr>
               ))}
-              {(!balances || balances.length === 0) && (
+              {(!displayedUsers || displayedUsers.length === 0) && (
                 <tr>
                   <td
                     colSpan={5}
                     className="px-6 py-8 text-center text-gray-500 text-sm"
                   >
-                    Nog geen gebruikers met credits
+                    {userFilter === "credits"
+                      ? "Geen gebruikers met danskrediet"
+                      : "Geen lijndansers gevonden. Wijs de rol 'lijndans' toe aan gebruikers."}
                   </td>
                 </tr>
               )}
@@ -317,19 +373,23 @@ export default function AdminCreditsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              {action === "add" ? "Credits Toevoegen" : "Credits Verwijderen"}
+              {action === "add"
+                ? "Danskrediet Toevoegen"
+                : "Danskrediet Verwijderen"}
             </h3>
             <p className="text-sm text-gray-600 mb-4">
               Voor:{" "}
               <strong>
-                {balances?.find((b) => b.userId === selectedUserId)?.userName}
+                {displayedUsers?.find((b) => b.userId === selectedUserId)
+                  ?.userName ??
+                  balances?.find((b) => b.userId === selectedUserId)?.userName}
               </strong>
             </p>
 
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Aantal credits
+                  Aantal krediet
                 </label>
                 <input
                   type="number"
@@ -401,7 +461,7 @@ export default function AdminCreditsPage() {
                   Methode
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                  Credits
+                  Krediet
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
                   Bedrag

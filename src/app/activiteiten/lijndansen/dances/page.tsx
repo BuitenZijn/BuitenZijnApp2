@@ -139,7 +139,7 @@ function EditDanceModal({
   onSave,
 }: {
   dance: {
-    _id: Id<"linedances_dances">;
+    _id: Id<"linedance_dances">;
     lesson_period?: string;
     lesson_year?: number;
     dance_name: string;
@@ -148,7 +148,7 @@ function EditDanceModal({
     video_url: string;
   };
   onClose: () => void;
-  onSave: (data: DanceFormData & { id: Id<"linedances_dances"> }) => void;
+  onSave: (data: DanceFormData & { id: Id<"linedance_dances"> }) => void;
 }) {
   const [formData, setFormData] = useState<DanceFormData>({
     lesson_period: dance.lesson_period || "Voorjaar",
@@ -349,7 +349,7 @@ export default function LijndansenBeheerPage() {
     name: string;
   } | null>(null);
   const [editingDance, setEditingDance] = useState<{
-    _id: Id<"linedances_dances">;
+    _id: Id<"linedance_dances">;
     lesson_period?: string;
     lesson_year?: number;
     dance_name: string;
@@ -447,7 +447,7 @@ export default function LijndansenBeheerPage() {
   };
 
   const handleEditSave = async (
-    data: DanceFormData & { id: Id<"linedances_dances"> },
+    data: DanceFormData & { id: Id<"linedance_dances"> },
   ) => {
     try {
       await updateDance({

@@ -11,14 +11,14 @@ export const seed = mutation({
   args: {},
   handler: async (ctx) => {
     // Check if packages already exist
-    const existing = await ctx.db.query("credit_packages").collect();
+    const existing = await ctx.db.query("linedance_credit_packages").collect();
     if (existing.length > 0) {
       return { message: "Packages already exist, skipping seed" };
     }
 
     const now = Date.now();
 
-    await ctx.db.insert("credit_packages", {
+    await ctx.db.insert("linedance_credit_packages", {
       name: "Losse beurt",
       credits: 1,
       priceInCents: 600,
@@ -26,7 +26,7 @@ export const seed = mutation({
       createdAt: now,
     });
 
-    await ctx.db.insert("credit_packages", {
+    await ctx.db.insert("linedance_credit_packages", {
       name: "5-beurtenkaart",
       credits: 5,
       priceInCents: 2500,

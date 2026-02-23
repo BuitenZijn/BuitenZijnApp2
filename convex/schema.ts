@@ -109,7 +109,7 @@ export default defineSchema({
   // LINEDANCE: DANCES
   // ==========================================
 
-  linedances_dances: defineTable({
+  linedance_dances: defineTable({
     lesson_period: v.string(),
     lesson_year: v.number(),
     dance_name: v.string(),
@@ -151,18 +151,18 @@ export default defineSchema({
     .index("by_read", ["read"]),
 
   // ==========================================
-  // DANCE CREDITS: Credit balance per user
+  // LINEDANCE: Danskrediet balance per user
   // ==========================================
-  dance_credits: defineTable({
+  linedance_credits: defineTable({
     userId: v.id("users"),
     balance: v.number(),
     updatedAt: v.number(),
   }).index("by_userId", ["userId"]),
 
   // ==========================================
-  // DANCE CREDITS: Purchasable packages (admin-configurable)
+  // LINEDANCE: Danskrediet packages (admin-configurable)
   // ==========================================
-  credit_packages: defineTable({
+  linedance_credit_packages: defineTable({
     name: v.string(),
     credits: v.number(),
     priceInCents: v.number(),
@@ -171,11 +171,11 @@ export default defineSchema({
   }),
 
   // ==========================================
-  // DANCE CREDITS: Purchase history / transactions
+  // LINEDANCE: Danskrediet purchase history / transactions
   // ==========================================
-  credit_purchases: defineTable({
+  linedance_credit_purchases: defineTable({
     userId: v.id("users"),
-    packageId: v.optional(v.id("credit_packages")),
+    packageId: v.optional(v.id("linedance_credit_packages")),
     credits: v.number(),
     amountPaidInCents: v.number(),
     paymentMethod: v.union(
@@ -192,9 +192,9 @@ export default defineSchema({
     .index("by_createdAt", ["createdAt"]),
 
   // ==========================================
-  // DANCE CREDITS: Lesson sessions (admin creates)
+  // LINEDANCE: Lesson sessions (admin creates)
   // ==========================================
-  dance_sessions: defineTable({
+  linedance_sessions: defineTable({
     date: v.string(),
     startTime: v.string(),
     endTime: v.string(),
@@ -207,11 +207,11 @@ export default defineSchema({
     .index("by_qrToken", ["qrToken"]),
 
   // ==========================================
-  // DANCE CREDITS: Check-in records
+  // LINEDANCE: Check-in records
   // ==========================================
-  dance_checkins: defineTable({
+  linedance_checkins: defineTable({
     userId: v.id("users"),
-    sessionId: v.id("dance_sessions"),
+    sessionId: v.id("linedance_sessions"),
     creditsDeducted: v.number(),
     checkedInAt: v.number(),
   })
@@ -222,7 +222,7 @@ export default defineSchema({
   // ==========================================
   // ELLA: Knutselen (crafts) videos
   // ==========================================
-  knutselen: defineTable({
+  ella_knutselen: defineTable({
     categorie: v.union(
       v.literal("tekenen"),
       v.literal("vouwen"),

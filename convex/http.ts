@@ -42,7 +42,7 @@ http.route({
     // Extract metadata
     const userId = session.metadata?.userId as Id<"users"> | undefined;
     const packageId = session.metadata?.packageId as
-      | Id<"credit_packages">
+      | Id<"linedance_credit_packages">
       | undefined;
     const credits = parseInt(session.metadata?.credits ?? "0", 10);
     const amountTotal = session.amount_total ?? 0; // in cents

@@ -12,7 +12,7 @@ export const listActive = query({
   args: {},
   handler: async (ctx) => {
     const packages = await ctx.db
-      .query("credit_packages")
+      .query("linedance_credit_packages")
       .filter((q) => q.eq(q.field("isActive"), true))
       .collect();
     return packages.sort((a, b) => a.credits - b.credits);
@@ -25,7 +25,7 @@ export const listActive = query({
 export const listAll = query({
   args: {},
   handler: async (ctx) => {
-    const packages = await ctx.db.query("credit_packages").collect();
+    const packages = await ctx.db.query("linedance_credit_packages").collect();
     return packages.sort((a, b) => a.credits - b.credits);
   },
 });
@@ -34,7 +34,7 @@ export const listAll = query({
  * Get a single credit package
  */
 export const get = query({
-  args: { packageId: v.id("credit_packages") },
+  args: { packageId: v.id("linedance_credit_packages") },
   handler: async (ctx, args) => {
     return await ctx.db.get(args.packageId);
   },
@@ -54,7 +54,7 @@ export const create = mutation({
     priceInCents: v.number(),
   },
   handler: async (ctx, args) => {
-    const id = await ctx.db.insert("credit_packages", {
+    const id = await ctx.db.insert("linedance_credit_packages", {
       name: args.name,
       credits: args.credits,
       priceInCents: args.priceInCents,
@@ -70,7 +70,7 @@ export const create = mutation({
  */
 export const update = mutation({
   args: {
-    packageId: v.id("credit_packages"),
+    packageId: v.id("linedance_credit_packages"),
     name: v.optional(v.string()),
     credits: v.optional(v.number()),
     priceInCents: v.optional(v.number()),
@@ -93,7 +93,7 @@ export const update = mutation({
  * Deactivate a credit package (soft delete)
  */
 export const deactivate = mutation({
-  args: { packageId: v.id("credit_packages") },
+  args: { packageId: v.id("linedance_credit_packages") },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.packageId, { isActive: false });
     return { success: true };

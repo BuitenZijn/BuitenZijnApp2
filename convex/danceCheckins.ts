@@ -14,7 +14,7 @@ export const checkIn = mutation({
   handler: async (ctx, args) => {
     // 1. Find session by QR token
     const session = await ctx.db
-      .query("dance_sessions")
+      .query("linedance_sessions")
       .withIndex("by_qrToken", (q) => q.eq("qrToken", args.qrToken))
       .unique();
 
@@ -29,7 +29,7 @@ export const checkIn = mutation({
 
     // 3. Check if user already checked in for this session
     const existingCheckin = await ctx.db
-      .query("dance_checkins")
+      .query("linedance_checkins")
       .withIndex("by_session_user", (q) =>
         q.eq("sessionId", session._id).eq("userId", args.userId),
       )
@@ -44,7 +44,7 @@ export const checkIn = mutation({
 
     // 4. Check credit balance
     const creditRecord = await ctx.db
-      .query("dance_credits")
+      .query("linedance_credits")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .unique();
 
@@ -53,7 +53,7 @@ export const checkIn = mutation({
     if (balance < 1) {
       return {
         success: false,
-        error: "Je hebt geen credits meer. Koop eerst credits aan.",
+        error: "Je hebt geen danskrediet meer. Koop eerst danskrediet aan.",
       };
     }
 
@@ -64,7 +64,7 @@ export const checkIn = mutation({
     });
 
     // 6. Record check-in
-    await ctx.db.insert("dance_checkins", {
+    await ctx.db.insert("linedance_checkins", {
       userId: args.userId,
       sessionId: session._id,
       creditsDeducted: 1,
@@ -88,7 +88,7 @@ export const getHistory = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
     const checkins = await ctx.db
-      .query("dance_checkins")
+      .query("linedance_checkins")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .order("desc")
       .take(50);
@@ -117,11 +117,11 @@ export const getHistory = query({
 export const isCheckedIn = query({
   args: {
     userId: v.id("users"),
-    sessionId: v.id("dance_sessions"),
+    sessionId: v.id("linedance_sessions"),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
-      .query("dance_checkins")
+      .query("linedance_checkins")
       .withIndex("by_session_user", (q) =>
         q.eq("sessionId", args.sessionId).eq("userId", args.userId),
       )

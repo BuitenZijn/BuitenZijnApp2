@@ -6,7 +6,7 @@ import { v } from "convex/values";
  */
 
 export const getPackage = internalQuery({
-  args: { packageId: v.id("credit_packages") },
+  args: { packageId: v.id("linedance_credit_packages") },
   handler: async (ctx, args) => {
     return await ctx.db.get(args.packageId);
   },
@@ -26,7 +26,7 @@ export const isPurchaseProcessed = internalQuery({
   args: { stripeSessionId: v.string() },
   handler: async (ctx, args) => {
     const existing = await ctx.db
-      .query("credit_purchases")
+      .query("linedance_credit_purchases")
       .withIndex("by_stripeSessionId", (q) =>
         q.eq("stripeSessionId", args.stripeSessionId),
       )

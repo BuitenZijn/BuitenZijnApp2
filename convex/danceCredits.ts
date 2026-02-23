@@ -12,7 +12,7 @@ export const getBalance = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
     const record = await ctx.db
-      .query("dance_credits")
+      .query("linedance_credits")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .unique();
     return record?.balance ?? 0;
@@ -26,7 +26,7 @@ export const getPurchaseHistory = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
     const purchases = await ctx.db
-      .query("credit_purchases")
+      .query("linedance_credit_purchases")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .order("desc")
       .take(50);
@@ -56,7 +56,7 @@ export const getAllPurchases = query({
   handler: async (ctx, args) => {
     const limit = args.limit ?? 200;
     const purchases = await ctx.db
-      .query("credit_purchases")
+      .query("linedance_credit_purchases")
       .withIndex("by_createdAt")
       .order("desc")
       .take(limit);
@@ -84,7 +84,7 @@ export const getAllPurchases = query({
 export const getAllBalances = query({
   args: {},
   handler: async (ctx) => {
-    const creditRecords = await ctx.db.query("dance_credits").collect();
+    const creditRecords = await ctx.db.query("linedance_credits").collect();
 
     const enriched = await Promise.all(
       creditRecords.map(async (cr) => {
@@ -95,10 +95,46 @@ export const getAllBalances = query({
           userName: user?.name ?? user?.firstName ?? user?.email ?? "Onbekend",
           userEmail: user?.email ?? "",
           userRole: user?.role ?? "guest",
+          userRoles: user?.roles ?? (user?.role ? [user.role] : ["guest"]),
           updatedAt: cr.updatedAt,
         };
       }),
     );
+
+    return enriched.sort((a, b) => a.userName.localeCompare(b.userName));
+  },
+});
+
+/**
+ * Get all users with 'lijndans' role, including those without credits (admin)
+ */
+export const getAllLijndansUsers = query({
+  args: {},
+  handler: async (ctx) => {
+    // Get all users
+    const allUsers = await ctx.db.query("users").collect();
+
+    // Filter to users with 'lijndans' or 'admin' role
+    const lijndansUsers = allUsers.filter((u) => {
+      const roles = u.roles ?? (u.role ? [u.role] : []);
+      return roles.includes("lijndans");
+    });
+
+    // Get all credit records
+    const creditRecords = await ctx.db.query("linedance_credits").collect();
+    const creditMap = new Map(
+      creditRecords.map((cr) => [cr.userId.toString(), cr.balance]),
+    );
+
+    const enriched = lijndansUsers.map((user) => ({
+      userId: user._id,
+      balance: creditMap.get(user._id.toString()) ?? 0,
+      userName: user.name ?? user.firstName ?? user.email ?? "Onbekend",
+      userEmail: user.email ?? "",
+      userRole: user.role ?? "guest",
+      userRoles: user.roles ?? (user.role ? [user.role] : ["guest"]),
+      updatedAt: Date.now(),
+    }));
 
     return enriched.sort((a, b) => a.userName.localeCompare(b.userName));
   },
@@ -120,7 +156,7 @@ export const addCredits = mutation({
       v.literal("cash"),
       v.literal("manual"),
     ),
-    packageId: v.optional(v.id("credit_packages")),
+    packageId: v.optional(v.id("linedance_credit_packages")),
     amountPaidInCents: v.optional(v.number()),
     stripeSessionId: v.optional(v.string()),
     note: v.optional(v.string()),
@@ -130,7 +166,7 @@ export const addCredits = mutation({
 
     // Update or create balance
     const existing = await ctx.db
-      .query("dance_credits")
+      .query("linedance_credits")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .unique();
 
@@ -140,7 +176,7 @@ export const addCredits = mutation({
         updatedAt: now,
       });
     } else {
-      await ctx.db.insert("dance_credits", {
+      await ctx.db.insert("linedance_credits", {
         userId: args.userId,
         balance: args.credits,
         updatedAt: now,
@@ -148,7 +184,7 @@ export const addCredits = mutation({
     }
 
     // Log the transaction
-    await ctx.db.insert("credit_purchases", {
+    await ctx.db.insert("linedance_credit_purchases", {
       userId: args.userId,
       packageId: args.packageId,
       credits: args.credits,
@@ -170,7 +206,7 @@ export const internalAddCredits = internalMutation({
   args: {
     userId: v.id("users"),
     credits: v.number(),
-    packageId: v.optional(v.id("credit_packages")),
+    packageId: v.optional(v.id("linedance_credit_packages")),
     amountPaidInCents: v.number(),
     stripeSessionId: v.string(),
   },
@@ -178,7 +214,7 @@ export const internalAddCredits = internalMutation({
     const now = Date.now();
 
     const existing = await ctx.db
-      .query("dance_credits")
+      .query("linedance_credits")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .unique();
 
@@ -188,14 +224,14 @@ export const internalAddCredits = internalMutation({
         updatedAt: now,
       });
     } else {
-      await ctx.db.insert("dance_credits", {
+      await ctx.db.insert("linedance_credits", {
         userId: args.userId,
         balance: args.credits,
         updatedAt: now,
       });
     }
 
-    await ctx.db.insert("credit_purchases", {
+    await ctx.db.insert("linedance_credit_purchases", {
       userId: args.userId,
       packageId: args.packageId,
       credits: args.credits,
@@ -220,12 +256,12 @@ export const removeCredits = mutation({
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
-      .query("dance_credits")
+      .query("linedance_credits")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .unique();
 
     if (!existing || existing.balance < args.credits) {
-      throw new Error("Onvoldoende credits");
+      throw new Error("Onvoldoende danskrediet");
     }
 
     await ctx.db.patch(existing._id, {
@@ -234,12 +270,12 @@ export const removeCredits = mutation({
     });
 
     // Log as negative transaction
-    await ctx.db.insert("credit_purchases", {
+    await ctx.db.insert("linedance_credit_purchases", {
       userId: args.userId,
       credits: -args.credits,
       amountPaidInCents: 0,
       paymentMethod: "manual",
-      note: args.note ?? "Credits verwijderd door admin",
+      note: args.note ?? "Danskrediet verwijderd door admin",
       createdAt: Date.now(),
     });
 
@@ -256,12 +292,12 @@ export const deductCredit = internalMutation({
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
-      .query("dance_credits")
+      .query("linedance_credits")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .unique();
 
     if (!existing || existing.balance < 1) {
-      throw new Error("Geen credits beschikbaar");
+      throw new Error("Geen danskrediet beschikbaar");
     }
 
     await ctx.db.patch(existing._id, {

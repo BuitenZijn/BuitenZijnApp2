@@ -397,7 +397,7 @@ export const populateKnutselen = internalMutation({
     const now = Date.now();
     let count = 0;
     for (const video of VIDEOS) {
-      await ctx.db.insert("knutselen", {
+      await ctx.db.insert("ella_knutselen", {
         categorie: video.categorie,
         titel: video.titel,
         youtube_url: video.youtube_url,

@@ -7,13 +7,13 @@ import { Sidebar } from "@/components/layout/Sidebar";
 
 /**
  * Dashboard Layout
- * 
+ *
  * Protected layout for authenticated users with sidebar navigation.
  */
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
-    <AuthGuard>
+    <AuthGuard requireAdmin>
       <div className="min-h-screen bg-beige-100 flex">
         {/* Sidebar */}
         <Sidebar />
@@ -25,9 +25,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
           {/* Page content */}
           <main className="flex-1 p-6 overflow-auto">
-            <div className="max-w-7xl mx-auto">
-              {children}
-            </div>
+            <div className="max-w-7xl mx-auto">{children}</div>
           </main>
         </div>
       </div>

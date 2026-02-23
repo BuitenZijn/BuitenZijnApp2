@@ -3,7 +3,7 @@ import { v } from "convex/values";
 
 // Query to get all dances
 export const getAllDances = query(async (ctx) => {
-  return await ctx.db.query("linedances_dances").order("desc").collect();
+  return await ctx.db.query("linedance_dances").order("desc").collect();
 });
 
 // Query to get dances by period and year
@@ -14,7 +14,7 @@ export const getDancesByPeriodYear = query({
   },
   handler: async (ctx, args) => {
     return await ctx.db
-      .query("linedances_dances")
+      .query("linedance_dances")
       .withIndex("by_lesson_period_year", (q) =>
         q
           .eq("lesson_period", args.lesson_period)
@@ -37,7 +37,7 @@ export const addDance = mutation({
   handler: async (ctx, args) => {
     const now = Date.now();
 
-    const id = await ctx.db.insert("linedances_dances", {
+    const id = await ctx.db.insert("linedance_dances", {
       lesson_period: args.lesson_period,
       lesson_year: args.lesson_year,
       dance_name: args.dance_name,
@@ -55,7 +55,7 @@ export const addDance = mutation({
 // Mutation to update a dance
 export const updateDance = mutation({
   args: {
-    id: v.id("linedances_dances"),
+    id: v.id("linedance_dances"),
     lesson_period: v.string(),
     lesson_year: v.number(),
     dance_name: v.string(),
@@ -78,7 +78,7 @@ export const updateDance = mutation({
 // Mutation to delete a dance
 export const deleteDance = mutation({
   args: {
-    id: v.id("linedances_dances"),
+    id: v.id("linedance_dances"),
   },
   handler: async (ctx, args) => {
     await ctx.db.delete(args.id);

@@ -12,7 +12,7 @@ export const getByQrToken = query({
   args: { qrToken: v.string() },
   handler: async (ctx, args) => {
     return await ctx.db
-      .query("dance_sessions")
+      .query("linedance_sessions")
       .withIndex("by_qrToken", (q) => q.eq("qrToken", args.qrToken))
       .unique();
   },
@@ -26,7 +26,7 @@ export const getToday = query({
   handler: async (ctx) => {
     const today = new Date().toISOString().split("T")[0];
     return await ctx.db
-      .query("dance_sessions")
+      .query("linedance_sessions")
       .withIndex("by_date", (q) => q.eq("date", today))
       .unique();
   },
@@ -44,7 +44,7 @@ export const list = query({
   handler: async (ctx, args) => {
     const limit = args.limit ?? 100;
     let sessions = await ctx.db
-      .query("dance_sessions")
+      .query("linedance_sessions")
       .withIndex("by_date")
       .order("desc")
       .take(limit);
@@ -63,7 +63,7 @@ export const list = query({
  * Get a single session
  */
 export const get = query({
-  args: { sessionId: v.id("dance_sessions") },
+  args: { sessionId: v.id("linedance_sessions") },
   handler: async (ctx, args) => {
     return await ctx.db.get(args.sessionId);
   },
@@ -73,10 +73,10 @@ export const get = query({
  * Get check-in count for a session
  */
 export const getCheckinCount = query({
-  args: { sessionId: v.id("dance_sessions") },
+  args: { sessionId: v.id("linedance_sessions") },
   handler: async (ctx, args) => {
     const checkins = await ctx.db
-      .query("dance_checkins")
+      .query("linedance_checkins")
       .withIndex("by_sessionId", (q) => q.eq("sessionId", args.sessionId))
       .collect();
     return checkins.length;
@@ -87,10 +87,10 @@ export const getCheckinCount = query({
  * Get attendees for a session (admin)
  */
 export const getAttendees = query({
-  args: { sessionId: v.id("dance_sessions") },
+  args: { sessionId: v.id("linedance_sessions") },
   handler: async (ctx, args) => {
     const checkins = await ctx.db
-      .query("dance_checkins")
+      .query("linedance_checkins")
       .withIndex("by_sessionId", (q) => q.eq("sessionId", args.sessionId))
       .collect();
 
@@ -145,7 +145,7 @@ export const create = mutation({
     const sessionDate = new Date(args.date + "T23:59:59");
     const qrExpiresAt = sessionDate.getTime();
 
-    const id = await ctx.db.insert("dance_sessions", {
+    const id = await ctx.db.insert("linedance_sessions", {
       date: args.date,
       startTime: args.startTime,
       endTime: args.endTime,
@@ -163,7 +163,7 @@ export const create = mutation({
  * Regenerate QR token for a session
  */
 export const regenerateQr = mutation({
-  args: { sessionId: v.id("dance_sessions") },
+  args: { sessionId: v.id("linedance_sessions") },
   handler: async (ctx, args) => {
     const session = await ctx.db.get(args.sessionId);
     if (!session) throw new Error("Sessie niet gevonden");
@@ -184,10 +184,10 @@ export const regenerateQr = mutation({
  * Delete a session (only if no check-ins)
  */
 export const remove = mutation({
-  args: { sessionId: v.id("dance_sessions") },
+  args: { sessionId: v.id("linedance_sessions") },
   handler: async (ctx, args) => {
     const checkins = await ctx.db
-      .query("dance_checkins")
+      .query("linedance_checkins")
       .withIndex("by_sessionId", (q) => q.eq("sessionId", args.sessionId))
       .first();
 

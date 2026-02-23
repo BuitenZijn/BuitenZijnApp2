@@ -27,7 +27,7 @@ const CATEGORIE_VALIDATOR = v.union(
 export const getAll = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("knutselen").order("desc").collect();
+    return await ctx.db.query("ella_knutselen").order("desc").collect();
   },
 });
 
@@ -38,7 +38,7 @@ export const getByCategorie = query({
   args: { categorie: CATEGORIE_VALIDATOR },
   handler: async (ctx, args) => {
     return await ctx.db
-      .query("knutselen")
+      .query("ella_knutselen")
       .withIndex("by_categorie", (q) => q.eq("categorie", args.categorie))
       .order("desc")
       .collect();
@@ -51,7 +51,7 @@ export const getByCategorie = query({
 export const getCategoryCounts = query({
   args: {},
   handler: async (ctx) => {
-    const all = await ctx.db.query("knutselen").collect();
+    const all = await ctx.db.query("ella_knutselen").collect();
     const counts: Record<string, number> = {};
     for (const item of all) {
       counts[item.categorie] = (counts[item.categorie] || 0) + 1;
@@ -64,7 +64,7 @@ export const getCategoryCounts = query({
  * Get a single knutsel video by ID
  */
 export const getById = query({
-  args: { id: v.id("knutselen") },
+  args: { id: v.id("ella_knutselen") },
   handler: async (ctx, args) => {
     return await ctx.db.get(args.id);
   },
@@ -87,7 +87,7 @@ export const add = mutation({
   },
   handler: async (ctx, args) => {
     const now = Date.now();
-    return await ctx.db.insert("knutselen", {
+    return await ctx.db.insert("ella_knutselen", {
       ...args,
       createdAt: now,
       updatedAt: now,
@@ -100,7 +100,7 @@ export const add = mutation({
  */
 export const update = mutation({
   args: {
-    id: v.id("knutselen"),
+    id: v.id("ella_knutselen"),
     categorie: v.optional(CATEGORIE_VALIDATOR),
     titel: v.optional(v.string()),
     youtube_url: v.optional(v.string()),
@@ -124,7 +124,7 @@ export const update = mutation({
  * Delete a knutsel video
  */
 export const remove = mutation({
-  args: { id: v.id("knutselen") },
+  args: { id: v.id("ella_knutselen") },
   handler: async (ctx, args) => {
     await ctx.db.delete(args.id);
     return { success: true };
