@@ -13,6 +13,8 @@ import {
   TicketIcon,
   QrCodeIcon,
   MusicalNoteIcon,
+  CalculatorIcon,
+  GlobeAltIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth } from "@/app/providers";
 
@@ -49,6 +51,21 @@ const linedanceNavigation = [
 
 const ellaNavigation = [
   { name: "Knutselen", href: "/dashboard/admin/ella", icon: TicketIcon },
+  {
+    name: "Rekenen",
+    href: "/dashboard/admin/ella/rekenen",
+    icon: CalculatorIcon,
+  },
+  {
+    name: "Dinosaurussen",
+    href: "/dashboard/admin/ella/dinosaurussen",
+    icon: GlobeAltIcon,
+  },
+  {
+    name: "Planeten",
+    href: "/dashboard/admin/ella/planeten",
+    icon: GlobeAltIcon,
+  },
 ];
 
 export function Sidebar() {

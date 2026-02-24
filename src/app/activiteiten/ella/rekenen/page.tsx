@@ -3,40 +3,32 @@
 import Link from "next/link";
 import { useAuth } from "@/app/providers";
 
-const sections = [
+const games = [
   {
-    name: "Knutselen",
-    slug: "knutselen",
-    description: "Leuke knutselfilmpjes per categorie!",
-    emoji: "✂️",
+    name: "Maaltafel Puzzel",
+    slug: "maaltafel-puzzel",
+    description: "Los de maaltafels op en onthul het plaatje!",
+    emoji: "🧩",
     available: true,
-    gradient: "from-pink-400 to-rose-500",
+    gradient: "from-violet-400 to-purple-500",
   },
   {
-    name: "Rekenen",
-    slug: "rekenen",
-    description: "Leuk oefenen met rekenen!",
-    emoji: "🔢",
-    available: true,
-    gradient: "from-purple-400 to-violet-500",
-  },
-  {
-    name: "Varia",
-    slug: "varia",
-    description: "Allerlei leuke activiteiten!",
-    emoji: "🌈",
+    name: "Rekenoefeningen",
+    slug: "oefeningen",
+    description: "Oefen met optellen, aftrekken, vermenigvuldigen en delen!",
+    emoji: "➕",
     available: false,
-    gradient: "from-fuchsia-400 to-pink-500",
+    gradient: "from-blue-400 to-indigo-500",
   },
 ];
 
-export default function EllaPage() {
+export default function RekenenPage() {
   const { user, isLoading, isAuthenticated } = useAuth();
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-rose-50 to-purple-50">
-        <div className="animate-pulse text-pink-400 text-xl">Laden...</div>
+        <div className="animate-pulse text-purple-400 text-xl">Laden...</div>
       </div>
     );
   }
@@ -53,7 +45,7 @@ export default function EllaPage() {
             Toegang geweigerd
           </h2>
           <p className="text-gray-500 text-sm">
-            Je hebt geen rechten om ELLA te bekijken.
+            Je hebt geen rechten om dit te bekijken.
           </p>
           <Link
             href="/"
@@ -69,31 +61,39 @@ export default function EllaPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-purple-50 py-12 px-4">
       <div className="max-w-4xl mx-auto">
+        {/* Back link */}
+        <Link
+          href="/activiteiten/ella"
+          className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-800 mb-8 text-sm font-medium"
+        >
+          ⬅ Terug naar ELLA
+        </Link>
+
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-extrabold bg-gradient-to-r from-pink-500 via-rose-500 to-purple-500 bg-clip-text text-transparent mb-3">
-            ✨ ELLA ✨
+          <h1 className="text-5xl font-extrabold bg-gradient-to-r from-purple-500 via-violet-500 to-indigo-500 bg-clip-text text-transparent mb-3">
+            🔢 Rekenen
           </h1>
           <p className="text-gray-500 text-lg">
-            Kies een activiteit om te beginnen!
+            Kies een rekenspel om te spelen!
           </p>
         </div>
 
-        {/* Section Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {sections.map((section) => {
+        {/* Game Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {games.map((game) => {
             const content = (
               <div
                 className={`relative rounded-2xl p-6 text-white shadow-lg transition-all duration-300 ${
-                  section.available
-                    ? `bg-gradient-to-br ${section.gradient} hover:shadow-xl hover:scale-[1.03] cursor-pointer`
+                  game.available
+                    ? `bg-gradient-to-br ${game.gradient} hover:shadow-xl hover:scale-[1.03] cursor-pointer`
                     : "bg-gray-300 cursor-not-allowed opacity-70"
                 }`}
               >
-                <div className="text-5xl mb-4">{section.emoji}</div>
-                <h2 className="text-2xl font-bold mb-2">{section.name}</h2>
-                <p className="text-white/80 text-sm">{section.description}</p>
-                {!section.available && (
+                <div className="text-5xl mb-4">{game.emoji}</div>
+                <h2 className="text-2xl font-bold mb-2">{game.name}</h2>
+                <p className="text-white/80 text-sm">{game.description}</p>
+                {!game.available && (
                   <div className="absolute top-3 right-3 bg-white/30 rounded-full px-3 py-1 text-xs font-semibold backdrop-blur-sm">
                     Binnenkort
                   </div>
@@ -101,15 +101,15 @@ export default function EllaPage() {
               </div>
             );
 
-            return section.available ? (
+            return game.available ? (
               <Link
-                key={section.slug}
-                href={`/activiteiten/ella/${section.slug}`}
+                key={game.slug}
+                href={`/activiteiten/ella/rekenen/${game.slug}`}
               >
                 {content}
               </Link>
             ) : (
-              <div key={section.slug}>{content}</div>
+              <div key={game.slug}>{content}</div>
             );
           })}
         </div>

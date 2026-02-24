@@ -241,4 +241,57 @@ export default defineSchema({
   })
     .index("by_categorie", ["categorie"])
     .index("by_createdAt", ["createdAt"]),
+
+  // ==========================================
+  // ELLA: Puzzle images for multiplication grid
+  // ==========================================
+  ella_puzzle_images: defineTable({
+    storageId: v.id("_storage"),
+    name: v.string(),
+    isActive: v.boolean(),
+    createdAt: v.number(),
+  }).index("by_active", ["isActive"]),
+
+  // ==========================================
+  // ELLA: Game settings (singleton per game)
+  // ==========================================
+  ella_game_settings: defineTable({
+    game: v.string(), // e.g. "multiplication_grid"
+    settings: v.object({
+      gridSize: v.number(),
+      blanksPerRound: v.number(),
+      bombChance: v.number(),
+    }),
+    updatedAt: v.number(),
+  }).index("by_game", ["game"]),
+
+  // ==========================================
+  // ELLA: Dinosaurs
+  // ==========================================
+  ella_dinosaurs: defineTable({
+    nummer: v.number(),
+    nederlandseNaam: v.string(),
+    wetenschappelijkeNaam: v.string(),
+    korteBeschrijving: v.string(),
+    leukWeetje: v.string(),
+    imageId: v.optional(v.id("_storage")),
+    createdAt: v.number(),
+  })
+    .index("by_nummer", ["nummer"])
+    .index("by_naam", ["nederlandseNaam"]),
+
+  // ==========================================
+  // ELLA: Planets
+  // ==========================================
+  ella_planets: defineTable({
+    nummer: v.number(),
+    nederlandseNaam: v.string(),
+    wetenschappelijkeNaam: v.string(),
+    korteBeschrijving: v.string(),
+    leukWeetje: v.string(),
+    imageId: v.optional(v.id("_storage")),
+    createdAt: v.number(),
+  })
+    .index("by_nummer", ["nummer"])
+    .index("by_naam", ["nederlandseNaam"]),
 });
