@@ -21,6 +21,14 @@ const sections = [
     gradient: "from-purple-400 to-violet-500",
   },
   {
+    name: "Planeten Puzzels",
+    slug: "planeten",
+    description: "Puzzel de planeten en ontdek het zonnestelsel!",
+    emoji: "🪐",
+    available: true,
+    gradient: "from-indigo-500 to-purple-600",
+  },
+  {
     name: "Varia",
     slug: "varia",
     description: "Allerlei leuke activiteiten!",

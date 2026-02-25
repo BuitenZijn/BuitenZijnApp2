@@ -21,6 +21,8 @@ export default function AdminPlanetsPage() {
   const setImage = useMutation(api.planets.setImage);
   const removeImage = useMutation(api.planets.removeImage);
   const updatePlanet = useMutation(api.planets.update);
+  const puzzleSettings = useQuery(api.planets.getPuzzleSettings);
+  const updatePuzzleSettings = useMutation(api.planets.updatePuzzleSettings);
 
   const [editId, setEditId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({
@@ -106,6 +108,37 @@ export default function AdminPlanetsPage() {
         <p className="text-gray-500 text-sm mt-1">
           Bekijk, bewerk en upload foto&apos;s voor de {planets?.length ?? 0}{" "}
           planeten
+        </p>
+      </div>
+
+      {/* Puzzle settings */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <h2 className="text-lg font-semibold text-gray-800 mb-3">
+          🧩 Puzzel-instellingen
+        </h2>
+        <div className="flex items-center gap-4 flex-wrap">
+          <label className="text-sm text-gray-600 font-medium">
+            Aantal stukjes (standaard):
+          </label>
+          <div className="flex gap-2">
+            {[3, 4, 5, 6].map((size) => (
+              <button
+                key={size}
+                onClick={() => updatePuzzleSettings({ piecesPerSide: size })}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  puzzleSettings?.piecesPerSide === size
+                    ? "bg-indigo-500 text-white shadow-md"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                {size}×{size} ({size * size} stukjes)
+              </button>
+            ))}
+          </div>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">
+          Dit is de standaard moeilijkheidsgraad. Spelers kunnen dit ook zelf
+          aanpassen op de spelpagina.
         </p>
       </div>
 

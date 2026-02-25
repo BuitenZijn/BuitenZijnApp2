@@ -138,6 +138,57 @@ export const update = mutation({
   },
 });
 
+// ==========================================
+// PLANET PUZZLE SETTINGS
+// ==========================================
+
+/**
+ * Get planet puzzle settings (pieces per side).
+ * Stored in ella_game_settings with game="planet_puzzle".
+ * We reuse the gridSize field for piecesPerSide.
+ */
+export const getPuzzleSettings = query({
+  handler: async (ctx) => {
+    const setting = await ctx.db
+      .query("ella_game_settings")
+      .withIndex("by_game", (q) => q.eq("game", "planet_puzzle"))
+      .first();
+
+    return {
+      piecesPerSide: setting?.settings.gridSize ?? 4, // default 4×4
+    };
+  },
+});
+
+/**
+ * Update planet puzzle settings (admin)
+ */
+export const updatePuzzleSettings = mutation({
+  args: { piecesPerSide: v.number() },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("ella_game_settings")
+      .withIndex("by_game", (q) => q.eq("game", "planet_puzzle"))
+      .first();
+
+    const settings = {
+      gridSize: args.piecesPerSide,
+      blanksPerRound: 0,
+      bombChance: 0,
+    };
+
+    if (existing) {
+      await ctx.db.patch(existing._id, { settings, updatedAt: Date.now() });
+    } else {
+      await ctx.db.insert("ella_game_settings", {
+        game: "planet_puzzle",
+        settings,
+        updatedAt: Date.now(),
+      });
+    }
+  },
+});
+
 /**
  * Delete a planet (and its image)
  */
