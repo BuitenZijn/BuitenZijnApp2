@@ -24,6 +24,7 @@ import type * as migrateRoles from "../migrateRoles.js";
 import type * as planets from "../planets.js";
 import type * as populate_knutselen from "../populate_knutselen.js";
 import type * as populate_lijndances from "../populate_lijndances.js";
+import type * as quizzes from "../quizzes.js";
 import type * as rekenen from "../rekenen.js";
 import type * as seedCreditPackages from "../seedCreditPackages.js";
 import type * as seedDinosaurs from "../seedDinosaurs.js";
@@ -55,6 +56,7 @@ declare const fullApi: ApiFromModules<{
   planets: typeof planets;
   populate_knutselen: typeof populate_knutselen;
   populate_lijndances: typeof populate_lijndances;
+  quizzes: typeof quizzes;
   rekenen: typeof rekenen;
   seedCreditPackages: typeof seedCreditPackages;
   seedDinosaurs: typeof seedDinosaurs;

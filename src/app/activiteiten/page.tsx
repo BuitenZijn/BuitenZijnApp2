@@ -16,6 +16,11 @@ const activities = [
     description: "Gezellige quizavonden.",
   },
   {
+    name: "Quizzen",
+    slug: "quizzen",
+    description: "Buzz quiz - beantwoord vragen zo snel mogelijk!",
+  },
+  {
     name: "Opruimacties",
     slug: "opruimacties",
     description: "Samen de natuur schoonmaken.",

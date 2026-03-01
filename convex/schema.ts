@@ -294,4 +294,98 @@ export default defineSchema({
   })
     .index("by_nummer", ["nummer"])
     .index("by_naam", ["nederlandseNaam"]),
+
+  // ==========================================
+  // BUZZ QUIZ: Quizzes
+  // ==========================================
+  quizzes: defineTable({
+    title: v.string(),
+    description: v.optional(v.string()),
+    isActive: v.boolean(),
+    createdBy: v.id("users"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_active", ["isActive"])
+    .index("by_createdAt", ["createdAt"]),
+
+  // ==========================================
+  // BUZZ QUIZ: Questions
+  // ==========================================
+  quiz_questions: defineTable({
+    quizId: v.id("quizzes"),
+    questionText: v.string(),
+    questionType: v.union(v.literal("multiple_choice"), v.literal("open")),
+    // For multiple choice: array of option strings
+    options: v.optional(v.array(v.string())),
+    // The correct answer (for MC: the correct option text, for open: accepted answer)
+    correctAnswer: v.string(),
+    // Points awarded for this question
+    points: v.number(),
+    // Order within the quiz
+    order: v.number(),
+    // Time limit in seconds (0 = no limit)
+    timeLimitSeconds: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_quizId", ["quizId"])
+    .index("by_quizId_order", ["quizId", "order"]),
+
+  // ==========================================
+  // BUZZ QUIZ: Game sessions (a live game instance)
+  // ==========================================
+  quiz_sessions: defineTable({
+    quizId: v.id("quizzes"),
+    // "lobby" | "active" | "question" | "revealing" | "finished"
+    status: v.union(
+      v.literal("lobby"),
+      v.literal("active"),
+      v.literal("question"),
+      v.literal("revealing"),
+      v.literal("finished"),
+    ),
+    joinCode: v.string(),
+    currentQuestionIndex: v.number(),
+    // Timestamp when current question was shown (for timing answers)
+    questionStartedAt: v.optional(v.number()),
+    createdBy: v.id("users"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_joinCode", ["joinCode"])
+    .index("by_status", ["status"])
+    .index("by_quizId", ["quizId"]),
+
+  // ==========================================
+  // BUZZ QUIZ: Session participants
+  // ==========================================
+  quiz_participants: defineTable({
+    sessionId: v.id("quiz_sessions"),
+    userId: v.optional(v.id("users")),
+    displayName: v.string(),
+    totalScore: v.number(),
+    joinedAt: v.number(),
+  })
+    .index("by_sessionId", ["sessionId"])
+    .index("by_session_user", ["sessionId", "userId"]),
+
+  // ==========================================
+  // BUZZ QUIZ: Answers
+  // ==========================================
+  quiz_answers: defineTable({
+    sessionId: v.id("quiz_sessions"),
+    questionId: v.id("quiz_questions"),
+    participantId: v.id("quiz_participants"),
+    answer: v.string(),
+    isCorrect: v.boolean(),
+    // Time in milliseconds from question shown to answer submitted
+    responseTimeMs: v.number(),
+    pointsAwarded: v.number(),
+    answeredAt: v.number(),
+  })
+    .index("by_sessionId", ["sessionId"])
+    .index("by_questionId", ["questionId"])
+    .index("by_participantId", ["participantId"])
+    .index("by_session_question", ["sessionId", "questionId"])
+    .index("by_session_participant", ["sessionId", "participantId"]),
 });

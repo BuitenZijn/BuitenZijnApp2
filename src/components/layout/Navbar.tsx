@@ -32,6 +32,7 @@ const navItems: NavItem[] = [
       { label: "Lijndansen", href: "/activiteiten/lijndansen" },
       { label: "Parelende Peloton", href: "/activiteiten/parelende-peloton" },
       { label: "Quiz", href: "/activiteiten/quiz" },
+      { label: "Quizzen", href: "/activiteiten/quizzen" },
     ],
   },
   {
