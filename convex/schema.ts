@@ -302,6 +302,23 @@ export default defineSchema({
     title: v.string(),
     description: v.optional(v.string()),
     isActive: v.boolean(),
+    // Scoring configuration
+    reactionTimeScoring: v.optional(v.boolean()), // Enable speed-based scoring
+    // "linear" = linear decay, "tiered" = time brackets, "flat" = no speed bonus
+    scoringMode: v.optional(
+      v.union(v.literal("linear"), v.literal("tiered"), v.literal("flat")),
+    ),
+    // For linear: minimum multiplier (0-1), e.g. 0.5 means slowest gets 50% of points
+    linearMinMultiplier: v.optional(v.number()),
+    // For tiered: bonus points per tier [fast, medium, slow] thresholds in ms and bonus points
+    tieredBrackets: v.optional(
+      v.array(
+        v.object({
+          withinMs: v.number(), // Answer within this many ms
+          bonusPoints: v.number(), // Extra points awarded
+        }),
+      ),
+    ),
     createdBy: v.id("users"),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -315,10 +332,22 @@ export default defineSchema({
   quiz_questions: defineTable({
     quizId: v.id("quizzes"),
     questionText: v.string(),
-    questionType: v.union(v.literal("multiple_choice"), v.literal("open")),
-    // For multiple choice: array of option strings
+    questionType: v.union(
+      v.literal("multiple_choice"),
+      v.literal("multiple_choice_picture"),
+      v.literal("open"),
+      v.literal("estimation"),
+      v.literal("ranking"),
+      v.literal("geo"),
+      v.literal("matching"),
+    ),
+    // For multiple choice: array of option strings (labels)
     options: v.optional(v.array(v.string())),
-    // The correct answer (for MC: the correct option text, for open: accepted answer)
+    // For multiple_choice_picture: array of image URLs matching options order
+    optionImageUrls: v.optional(v.array(v.string())),
+    // The correct answer (for MC: the correct option text, for open: accepted answer,
+    // for estimation: the number as string, for ranking: JSON array of correct order,
+    // for geo: "lat,lng", for matching: JSON object mapping left→right)
     correctAnswer: v.string(),
     // Points awarded for this question
     points: v.number(),
@@ -326,6 +355,14 @@ export default defineSchema({
     order: v.number(),
     // Time limit in seconds (0 = no limit)
     timeLimitSeconds: v.number(),
+    // For estimation: unit label (e.g. "km", "jaar", "inwoners")
+    estimationUnit: v.optional(v.string()),
+    // For geo: map center and zoom
+    geoZoom: v.optional(v.number()),
+    // For matching: array of left→right pairs
+    matchingPairs: v.optional(
+      v.array(v.object({ left: v.string(), right: v.string() })),
+    ),
     createdAt: v.number(),
   })
     .index("by_quizId", ["quizId"])

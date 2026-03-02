@@ -48,12 +48,29 @@ export const updateQuiz = mutation({
     title: v.string(),
     description: v.optional(v.string()),
     isActive: v.boolean(),
+    reactionTimeScoring: v.optional(v.boolean()),
+    scoringMode: v.optional(
+      v.union(v.literal("linear"), v.literal("tiered"), v.literal("flat")),
+    ),
+    linearMinMultiplier: v.optional(v.number()),
+    tieredBrackets: v.optional(
+      v.array(
+        v.object({
+          withinMs: v.number(),
+          bonusPoints: v.number(),
+        }),
+      ),
+    ),
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.id, {
       title: args.title,
       description: args.description,
       isActive: args.isActive,
+      reactionTimeScoring: args.reactionTimeScoring,
+      scoringMode: args.scoringMode,
+      linearMinMultiplier: args.linearMinMultiplier,
+      tieredBrackets: args.tieredBrackets,
       updatedAt: Date.now(),
     });
     return args.id;
@@ -76,6 +93,24 @@ export const deleteQuiz = mutation({
 });
 
 // ==========================================
+// FILE UPLOAD (for question images)
+// ==========================================
+
+export const generateUploadUrl = mutation({
+  handler: async (ctx) => {
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
+/** Convert a storageId to a public URL */
+export const getStorageUrl = mutation({
+  args: { storageId: v.id("_storage") },
+  handler: async (ctx, args) => {
+    return await ctx.storage.getUrl(args.storageId);
+  },
+});
+
+// ==========================================
 // QUESTION CRUD (Admin)
 // ==========================================
 
@@ -93,12 +128,26 @@ export const addQuestion = mutation({
   args: {
     quizId: v.id("quizzes"),
     questionText: v.string(),
-    questionType: v.union(v.literal("multiple_choice"), v.literal("open")),
+    questionType: v.union(
+      v.literal("multiple_choice"),
+      v.literal("multiple_choice_picture"),
+      v.literal("open"),
+      v.literal("estimation"),
+      v.literal("ranking"),
+      v.literal("geo"),
+      v.literal("matching"),
+    ),
     options: v.optional(v.array(v.string())),
+    optionImageUrls: v.optional(v.array(v.string())),
     correctAnswer: v.string(),
     points: v.number(),
     order: v.number(),
     timeLimitSeconds: v.number(),
+    estimationUnit: v.optional(v.string()),
+    geoZoom: v.optional(v.number()),
+    matchingPairs: v.optional(
+      v.array(v.object({ left: v.string(), right: v.string() })),
+    ),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("quiz_questions", {
@@ -112,12 +161,26 @@ export const updateQuestion = mutation({
   args: {
     id: v.id("quiz_questions"),
     questionText: v.string(),
-    questionType: v.union(v.literal("multiple_choice"), v.literal("open")),
+    questionType: v.union(
+      v.literal("multiple_choice"),
+      v.literal("multiple_choice_picture"),
+      v.literal("open"),
+      v.literal("estimation"),
+      v.literal("ranking"),
+      v.literal("geo"),
+      v.literal("matching"),
+    ),
     options: v.optional(v.array(v.string())),
+    optionImageUrls: v.optional(v.array(v.string())),
     correctAnswer: v.string(),
     points: v.number(),
     order: v.number(),
     timeLimitSeconds: v.number(),
+    estimationUnit: v.optional(v.string()),
+    geoZoom: v.optional(v.number()),
+    matchingPairs: v.optional(
+      v.array(v.object({ left: v.string(), right: v.string() })),
+    ),
   },
   handler: async (ctx, args) => {
     const { id, ...data } = args;
@@ -164,6 +227,36 @@ export const createSession = mutation({
       updatedAt: now,
     });
   },
+});
+
+export const getLiveSessions = query(async (ctx) => {
+  const [lobby, active, question, revealing] = await Promise.all([
+    ctx.db
+      .query("quiz_sessions")
+      .withIndex("by_status", (q) => q.eq("status", "lobby"))
+      .collect(),
+    ctx.db
+      .query("quiz_sessions")
+      .withIndex("by_status", (q) => q.eq("status", "active"))
+      .collect(),
+    ctx.db
+      .query("quiz_sessions")
+      .withIndex("by_status", (q) => q.eq("status", "question"))
+      .collect(),
+    ctx.db
+      .query("quiz_sessions")
+      .withIndex("by_status", (q) => q.eq("status", "revealing"))
+      .collect(),
+  ]);
+  const sessions = [...lobby, ...active, ...question, ...revealing];
+  // Enrich with quiz title
+  const enriched = await Promise.all(
+    sessions.map(async (s) => {
+      const quiz = await ctx.db.get(s.quizId);
+      return { ...s, quizTitle: quiz?.title ?? "Quiz" };
+    }),
+  );
+  return enriched;
 });
 
 export const getSession = query({
@@ -334,20 +427,143 @@ export const submitAnswer = mutation({
     const question = await ctx.db.get(args.questionId);
     if (!question) throw new Error("Question not found");
 
-    // Check correctness
-    const isCorrect =
-      args.answer.trim().toLowerCase() ===
-      question.correctAnswer.trim().toLowerCase();
+    const session = await ctx.db.get(args.sessionId);
+    if (!session) throw new Error("Session not found");
+    const quiz = await ctx.db.get(session.quizId);
 
-    // Speed bonus: faster = more points (max 2x if instant)
+    // Check correctness based on question type
+    const basePoints = question.points;
     const timeLimit = question.timeLimitSeconds * 1000;
+    let isCorrect = false;
     let pointsAwarded = 0;
-    if (isCorrect) {
-      const speedFactor =
-        timeLimit > 0
-          ? Math.max(0.5, 1 - args.responseTimeMs / timeLimit) + 0.5
-          : 1;
-      pointsAwarded = Math.round(question.points * speedFactor);
+
+    if (question.questionType === "estimation") {
+      // Estimation: score based on closeness to correct number
+      const correctNum = parseFloat(question.correctAnswer);
+      const playerNum = parseFloat(args.answer);
+      if (!isNaN(correctNum) && !isNaN(playerNum)) {
+        if (correctNum === 0) {
+          // Special case: correct answer is 0
+          const absError = Math.abs(playerNum);
+          isCorrect = absError < 0.001;
+          pointsAwarded = isCorrect
+            ? basePoints
+            : Math.round(basePoints * Math.max(0, 1 - absError));
+        } else {
+          const relativeError =
+            Math.abs(playerNum - correctNum) / Math.abs(correctNum);
+          isCorrect = relativeError < 0.001; // essentially exact
+          // Score: full points at 0% error, 0 points at >=100% error
+          pointsAwarded = Math.round(
+            basePoints * Math.max(0, 1 - relativeError),
+          );
+        }
+      }
+    } else if (question.questionType === "ranking") {
+      // Ranking: score per correct position
+      try {
+        const correctOrder: string[] = JSON.parse(question.correctAnswer);
+        const playerOrder: string[] = JSON.parse(args.answer);
+        let correctCount = 0;
+        for (let i = 0; i < correctOrder.length; i++) {
+          if (playerOrder[i] === correctOrder[i]) correctCount++;
+        }
+        isCorrect = correctCount === correctOrder.length;
+        // Partial scoring: proportional to how many are in the right spot
+        pointsAwarded = Math.round(
+          basePoints * (correctCount / correctOrder.length),
+        );
+      } catch {
+        isCorrect = false;
+        pointsAwarded = 0;
+      }
+    } else if (question.questionType === "geo") {
+      // Geo: score based on distance (in km) from correct location
+      try {
+        const [correctLat, correctLng] = question.correctAnswer
+          .split(",")
+          .map(Number);
+        const [playerLat, playerLng] = args.answer.split(",").map(Number);
+        // Haversine distance calculation
+        const R = 6371; // Earth radius in km
+        const dLat = ((playerLat - correctLat) * Math.PI) / 180;
+        const dLng = ((playerLng - correctLng) * Math.PI) / 180;
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos((correctLat * Math.PI) / 180) *
+            Math.cos((playerLat * Math.PI) / 180) *
+            Math.sin(dLng / 2) *
+            Math.sin(dLng / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distKm = R * c;
+        isCorrect = distKm < 50; // Within 50km = "correct"
+        // Full points within 50km, linearly decays to 0 at 2000km
+        const maxDist = 2000;
+        pointsAwarded =
+          distKm < 50
+            ? basePoints
+            : Math.round(basePoints * Math.max(0, 1 - distKm / maxDist));
+      } catch {
+        isCorrect = false;
+        pointsAwarded = 0;
+      }
+    } else if (question.questionType === "matching") {
+      // Matching: score per correct pair
+      try {
+        const correctPairs: Record<string, string> = JSON.parse(
+          question.correctAnswer,
+        );
+        const playerPairs: Record<string, string> = JSON.parse(args.answer);
+        const keys = Object.keys(correctPairs);
+        let correctCount = 0;
+        for (const key of keys) {
+          if (playerPairs[key] === correctPairs[key]) correctCount++;
+        }
+        isCorrect = correctCount === keys.length;
+        pointsAwarded = Math.round(basePoints * (correctCount / keys.length));
+      } catch {
+        isCorrect = false;
+        pointsAwarded = 0;
+      }
+    } else {
+      // MC / open: exact string match
+      isCorrect =
+        args.answer.trim().toLowerCase() ===
+        question.correctAnswer.trim().toLowerCase();
+      pointsAwarded = isCorrect ? basePoints : 0;
+    }
+
+    // Apply reaction time scoring for types that use it (MC, open, estimation)
+    if (
+      pointsAwarded > 0 &&
+      question.questionType !== "ranking" &&
+      question.questionType !== "geo" &&
+      question.questionType !== "matching"
+    ) {
+      const useReactionTime = quiz?.reactionTimeScoring ?? false;
+      const scoringMode = quiz?.scoringMode ?? "linear";
+
+      if (useReactionTime && scoringMode !== "flat") {
+        if (scoringMode === "tiered") {
+          // Tiered scoring: base points + bonus for speed brackets
+          const brackets = quiz?.tieredBrackets ?? [];
+          const sorted = [...brackets].sort((a, b) => a.withinMs - b.withinMs);
+          for (const bracket of sorted) {
+            if (args.responseTimeMs <= bracket.withinMs) {
+              pointsAwarded = pointsAwarded + bracket.bonusPoints;
+              break;
+            }
+          }
+        } else {
+          // Linear scoring (default): multiplier decays linearly from 1.0 to minMultiplier
+          const minMult = quiz?.linearMinMultiplier ?? 0.5;
+          if (timeLimit > 0) {
+            const ratio = Math.min(1, args.responseTimeMs / timeLimit);
+            const multiplier = 1 - ratio * (1 - minMult);
+            pointsAwarded = Math.round(pointsAwarded * multiplier);
+          }
+        }
+      }
     }
 
     const answerId = await ctx.db.insert("quiz_answers", {
@@ -417,17 +633,33 @@ export const getCurrentQuestion = query({
 
     // Don't send correct answer to players during active question
     if (session.status === "question") {
+      // For matching, send only shuffled right-side options (not the mapping)
+      let shuffledRightOptions: string[] | undefined;
+      if (current.questionType === "matching" && current.matchingPairs) {
+        shuffledRightOptions = current.matchingPairs
+          .map((p) => p.right)
+          .sort(() => Math.random() - 0.5);
+      }
       return {
         _id: current._id,
         questionText: current.questionText,
         questionType: current.questionType,
         options: current.options,
+        optionImageUrls: current.optionImageUrls,
         points: current.points,
         timeLimitSeconds: current.timeLimitSeconds,
         order: current.order,
         questionStartedAt: session.questionStartedAt,
         totalQuestions: questions.length,
         currentIndex: session.currentQuestionIndex,
+        estimationUnit: current.estimationUnit,
+        geoZoom: current.geoZoom,
+        // For matching: left items + shuffled right items (not the correct mapping)
+        matchingPairs:
+          current.questionType === "matching" && current.matchingPairs
+            ? current.matchingPairs.map((p) => ({ left: p.left, right: "" }))
+            : undefined,
+        shuffledRightOptions,
       };
     }
 
@@ -437,6 +669,7 @@ export const getCurrentQuestion = query({
       questionText: current.questionText,
       questionType: current.questionType,
       options: current.options,
+      optionImageUrls: current.optionImageUrls,
       correctAnswer: current.correctAnswer,
       points: current.points,
       timeLimitSeconds: current.timeLimitSeconds,
@@ -444,6 +677,9 @@ export const getCurrentQuestion = query({
       questionStartedAt: session.questionStartedAt,
       totalQuestions: questions.length,
       currentIndex: session.currentQuestionIndex,
+      estimationUnit: current.estimationUnit,
+      geoZoom: current.geoZoom,
+      matchingPairs: current.matchingPairs,
     };
   },
 });

@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useParams } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../../../convex/_generated/api";
@@ -128,13 +129,18 @@ export default function LiveQuizPage() {
                   {currentQuestion.questionText}
                 </h2>
 
-                {currentQuestion.questionType === "multiple_choice" &&
+                {(currentQuestion.questionType === "multiple_choice" ||
+                  currentQuestion.questionType === "multiple_choice_picture") &&
                   currentQuestion.options && (
                     <div className="grid grid-cols-2 gap-3">
                       {currentQuestion.options.map((opt, i) => {
                         const isCorrect =
                           session.status === "revealing" &&
                           opt === currentQuestion.correctAnswer;
+                        const isPicture =
+                          currentQuestion.questionType ===
+                          "multiple_choice_picture";
+                        const imageUrl = currentQuestion.optionImageUrls?.[i];
                         const colors = [
                           "bg-red-500/80",
                           "bg-blue-500/80",
@@ -152,6 +158,13 @@ export default function LiveQuizPage() {
                                 : colors[i % colors.length]
                             }`}
                           >
+                            {isPicture && imageUrl && (
+                              <img
+                                src={imageUrl}
+                                alt={opt}
+                                className="w-full h-40 object-cover rounded-lg mb-2"
+                              />
+                            )}
                             {String.fromCharCode(65 + i)}. {opt}
                             {isCorrect && " ✓"}
                           </div>
@@ -172,6 +185,109 @@ export default function LiveQuizPage() {
                     )}
                   </div>
                 )}
+
+                {/* ESTIMATION on host */}
+                {currentQuestion.questionType === "estimation" && (
+                  <div className="text-center py-4">
+                    <p className="text-purple-300 text-lg">
+                      📊 Schattingsvraag — spelers voeren een getal in
+                      {currentQuestion.estimationUnit &&
+                        ` (${currentQuestion.estimationUnit})`}
+                    </p>
+                    {session.status === "revealing" && (
+                      <p className="text-green-400 text-2xl font-bold mt-2">
+                        Correct:{" "}
+                        {Number(currentQuestion.correctAnswer).toLocaleString(
+                          "nl-BE",
+                        )}
+                        {currentQuestion.estimationUnit &&
+                          ` ${currentQuestion.estimationUnit}`}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* RANKING on host */}
+                {currentQuestion.questionType === "ranking" &&
+                  currentQuestion.options && (
+                    <div className="py-4">
+                      <p className="text-purple-300 text-lg text-center mb-3">
+                        🔢 Rangschikken — spelers zetten items in de juiste
+                        volgorde
+                      </p>
+                      {session.status === "revealing" && (
+                        <div className="space-y-2 max-w-md mx-auto">
+                          {currentQuestion.options.map((item, i) => (
+                            <div
+                              key={i}
+                              className="flex items-center gap-3 bg-green-500/20 rounded-lg px-4 py-2"
+                            >
+                              <span className="text-green-400 font-bold text-lg">
+                                {i + 1}.
+                              </span>
+                              <span className="text-white font-medium">
+                                {item}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                {/* GEO on host */}
+                {currentQuestion.questionType === "geo" && (
+                  <div className="text-center py-4">
+                    <p className="text-purple-300 text-lg mb-3">
+                      🗺️ Locatievraag — spelers tikken op de kaart
+                    </p>
+                    {session.status === "revealing" &&
+                      currentQuestion.correctAnswer && (
+                        <div>
+                          <p className="text-green-400 text-lg font-bold mb-2">
+                            📍 Correcte locatie: {currentQuestion.correctAnswer}
+                          </p>
+                          <iframe
+                            title="Correct location"
+                            width="100%"
+                            height="250"
+                            style={{
+                              border: "1px solid rgba(255,255,255,0.2)",
+                              borderRadius: 12,
+                            }}
+                            src={`https://www.openstreetmap.org/export/embed.html?bbox=${Number(currentQuestion.correctAnswer.split(",")[1]) - 1},${Number(currentQuestion.correctAnswer.split(",")[0]) - 0.5},${Number(currentQuestion.correctAnswer.split(",")[1]) + 1},${Number(currentQuestion.correctAnswer.split(",")[0]) + 0.5}&layer=mapnik&marker=${currentQuestion.correctAnswer}`}
+                          />
+                        </div>
+                      )}
+                  </div>
+                )}
+
+                {/* MATCHING on host */}
+                {currentQuestion.questionType === "matching" &&
+                  currentQuestion.matchingPairs && (
+                    <div className="py-4">
+                      <p className="text-purple-300 text-lg text-center mb-3">
+                        🔗 Koppelvraag — spelers verbinden paren
+                      </p>
+                      {session.status === "revealing" && (
+                        <div className="grid grid-cols-3 gap-2 max-w-lg mx-auto items-center">
+                          {currentQuestion.matchingPairs.map((pair, i) => (
+                            <React.Fragment key={i}>
+                              <div className="bg-blue-500/30 rounded-lg px-3 py-2 text-center text-white font-medium">
+                                {pair.left}
+                              </div>
+                              <div className="text-center text-green-400 font-bold">
+                                →
+                              </div>
+                              <div className="bg-green-500/30 rounded-lg px-3 py-2 text-center text-white font-medium">
+                                {pair.right}
+                              </div>
+                            </React.Fragment>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
               </Card>
 
               {/* Answer stats */}
