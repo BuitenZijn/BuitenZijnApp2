@@ -43,8 +43,25 @@ function parseICSDate(raw: string): Date | null {
     if (raw.endsWith("Z")) {
       return new Date(Date.UTC(y, m, d, h, min, s));
     }
-    // Otherwise treat as UTC as well (Google Calendar ICS is typically UTC)
-    return new Date(Date.UTC(y, m, d, h, min, s));
+    // Non-UTC: treat as Europe/Brussels local time.
+    // Compute the Brussels→UTC offset for this datetime by checking
+    // what Brussels would display for the same numbers interpreted as UTC.
+    const guessUTC = new Date(Date.UTC(y, m, d, h, min, s));
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Europe/Brussels",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    }).formatToParts(guessUTC);
+    const brusselsH = Number(parts.find((p) => p.type === "hour")?.value ?? 0);
+    const brusselsMin = Number(
+      parts.find((p) => p.type === "minute")?.value ?? 0,
+    );
+    let offsetMs = (brusselsH * 60 + brusselsMin - (h * 60 + min)) * 60 * 1000;
+    if (offsetMs > 12 * 3600000) offsetMs -= 24 * 3600000;
+    if (offsetMs < -12 * 3600000) offsetMs += 24 * 3600000;
+    // Input is Brussels local → UTC = guessUTC − offset
+    return new Date(guessUTC.getTime() - offsetMs);
   }
   return null;
 }

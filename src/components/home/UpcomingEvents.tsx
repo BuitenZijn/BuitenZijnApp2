@@ -40,6 +40,7 @@ function formatDate(iso: string): string {
     weekday: "short",
     day: "numeric",
     month: "long",
+    timeZone: "Europe/Brussels",
   });
 }
 
@@ -49,6 +50,7 @@ function formatTime(iso: string): string {
   return d.toLocaleTimeString("nl-BE", {
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "Europe/Brussels",
   });
 }
 

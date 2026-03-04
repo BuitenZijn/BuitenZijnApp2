@@ -17,6 +17,20 @@ type QuestionType =
   | "geo"
   | "matching";
 
+type RoundType = "regular" | "sudden_death" | "eliminatie";
+
+interface RoundForm {
+  name: string;
+  roundType: RoundType;
+  eliminateCount: number;
+}
+
+const emptyRound: RoundForm = {
+  name: "",
+  roundType: "regular",
+  eliminateCount: 1,
+};
+
 interface QuestionForm {
   questionText: string;
   questionType: QuestionType;
@@ -31,6 +45,7 @@ interface QuestionForm {
   geoZoom: number;
   matchingPairs: { left: string; right: string }[];
   rankingItems: string[];
+  roundId: string; // "" means no round
 }
 
 const emptyQuestion: QuestionForm = {
@@ -52,6 +67,7 @@ const emptyQuestion: QuestionForm = {
     { left: "", right: "" },
   ],
   rankingItems: ["", "", "", ""],
+  roundId: "",
 };
 
 export default function QuizDetailPage() {
@@ -62,10 +78,14 @@ export default function QuizDetailPage() {
 
   const quiz = useQuery(api.quizzes.getQuiz, { id: quizId });
   const questions = useQuery(api.quizzes.getQuestions, { quizId });
+  const rounds = useQuery(api.quizzes.getRounds, { quizId });
   const updateQuiz = useMutation(api.quizzes.updateQuiz);
   const addQuestion = useMutation(api.quizzes.addQuestion);
   const updateQuestion = useMutation(api.quizzes.updateQuestion);
   const deleteQuestion = useMutation(api.quizzes.deleteQuestion);
+  const addRound = useMutation(api.quizzes.addRound);
+  const updateRoundMut = useMutation(api.quizzes.updateRound);
+  const deleteRoundMut = useMutation(api.quizzes.deleteRound);
   const generateUploadUrl = useMutation(api.quizzes.generateUploadUrl);
   const getStorageUrl = useMutation(api.quizzes.getStorageUrl);
 
@@ -93,6 +113,13 @@ export default function QuizDetailPage() {
   const [saving, setSaving] = useState(false);
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Round state
+  const [showAddRound, setShowAddRound] = useState(false);
+  const [roundForm, setRoundForm] = useState<RoundForm>({ ...emptyRound });
+  const [editingRoundId, setEditingRoundId] =
+    useState<Id<"quiz_rounds"> | null>(null);
+  const [savingRound, setSavingRound] = useState(false);
 
   const handleImageUpload = async (file: File, optionIndex: number) => {
     setUploadingIndex(optionIndex);
@@ -191,6 +218,7 @@ export default function QuizDetailPage() {
         { left: "", right: "" },
       ],
       rankingItems,
+      roundId: (q as any).roundId || "",
     });
     setEditingQuestionId(q._id);
     setShowAddQuestion(true);
@@ -249,6 +277,7 @@ export default function QuizDetailPage() {
         estimationUnit,
         geoZoom,
         matchingPairs,
+        roundId: form.roundId ? (form.roundId as Id<"quiz_rounds">) : undefined,
       };
 
       if (editingQuestionId) {
@@ -285,7 +314,7 @@ export default function QuizDetailPage() {
     setShowAddQuestion(false);
   };
 
-  if (quiz === undefined || questions === undefined) {
+  if (quiz === undefined || questions === undefined || rounds === undefined) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-beige-100 to-purple-50 flex items-center justify-center">
         <p className="text-gray-500">Laden...</p>
@@ -554,6 +583,237 @@ export default function QuizDetailPage() {
           )}
         </Card>
 
+        {/* ==================== ROUNDS SECTION ==================== */}
+        {isAdmin && (
+          <Card className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-navy-800">🎯 Rondes</h2>
+              {!showAddRound && (
+                <button
+                  onClick={() => {
+                    setRoundForm({ ...emptyRound });
+                    setEditingRoundId(null);
+                    setShowAddRound(true);
+                  }}
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium text-sm"
+                >
+                  + Ronde Toevoegen
+                </button>
+              )}
+            </div>
+
+            {rounds.length === 0 && !showAddRound && (
+              <p className="text-gray-500 text-sm">
+                Geen rondes — alle vragen worden als één reeks gespeeld. Voeg
+                rondes toe om sudden death, eliminatie of aparte rondes te
+                configureren.
+              </p>
+            )}
+
+            {/* Add/Edit round form */}
+            {showAddRound && (
+              <div className="border border-indigo-200 rounded-lg p-4 bg-indigo-50/50 mb-4 space-y-3">
+                <h3 className="text-sm font-semibold text-indigo-800">
+                  {editingRoundId ? "Ronde Bewerken" : "Nieuwe Ronde"}
+                </h3>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Naam
+                    </label>
+                    <input
+                      type="text"
+                      value={roundForm.name}
+                      onChange={(e) =>
+                        setRoundForm({ ...roundForm, name: e.target.value })
+                      }
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400"
+                      placeholder="bijv. Ronde 1 — Opwarming"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Type
+                    </label>
+                    <select
+                      value={roundForm.roundType}
+                      onChange={(e) =>
+                        setRoundForm({
+                          ...roundForm,
+                          roundType: e.target.value as RoundType,
+                        })
+                      }
+                      className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400"
+                    >
+                      <option value="regular">🟢 Regulier</option>
+                      <option value="sudden_death">💀 Sudden Death</option>
+                      <option value="eliminatie">🚫 Eliminatie</option>
+                    </select>
+                  </div>
+                  {roundForm.roundType === "eliminatie" && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Elimineer per vraag
+                      </label>
+                      <input
+                        type="number"
+                        value={roundForm.eliminateCount}
+                        onChange={(e) =>
+                          setRoundForm({
+                            ...roundForm,
+                            eliminateCount: Math.max(1, Number(e.target.value)),
+                          })
+                        }
+                        className="w-20 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400"
+                        min={1}
+                      />
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500">
+                  {roundForm.roundType === "regular" &&
+                    "Standaard ronde — geen eliminatie."}
+                  {roundForm.roundType === "sudden_death" &&
+                    "💀 Eén fout antwoord = uitgeschakeld!"}
+                  {roundForm.roundType === "eliminatie" &&
+                    `🚫 Na elke vraag worden de laagste ${roundForm.eliminateCount} speler(s) geëlimineerd.`}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={async () => {
+                      setSavingRound(true);
+                      try {
+                        if (editingRoundId) {
+                          await updateRoundMut({
+                            id: editingRoundId,
+                            name: roundForm.name,
+                            roundType: roundForm.roundType,
+                            order:
+                              rounds.find((r) => r._id === editingRoundId)
+                                ?.order ?? 0,
+                            eliminateCount:
+                              roundForm.roundType === "eliminatie"
+                                ? roundForm.eliminateCount
+                                : undefined,
+                          });
+                        } else {
+                          await addRound({
+                            quizId,
+                            name: roundForm.name,
+                            roundType: roundForm.roundType,
+                            order: rounds.length,
+                            eliminateCount:
+                              roundForm.roundType === "eliminatie"
+                                ? roundForm.eliminateCount
+                                : undefined,
+                          });
+                        }
+                        setRoundForm({ ...emptyRound });
+                        setEditingRoundId(null);
+                        setShowAddRound(false);
+                      } finally {
+                        setSavingRound(false);
+                      }
+                    }}
+                    disabled={savingRound || !roundForm.name.trim()}
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 font-medium text-sm"
+                  >
+                    {savingRound
+                      ? "Opslaan..."
+                      : editingRoundId
+                        ? "Bijwerken"
+                        : "Toevoegen"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowAddRound(false);
+                      setEditingRoundId(null);
+                      setRoundForm({ ...emptyRound });
+                    }}
+                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 text-sm"
+                  >
+                    Annuleren
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Rounds list */}
+            {rounds.length > 0 && (
+              <div className="space-y-2">
+                {rounds.map((r, idx) => (
+                  <div
+                    key={r._id}
+                    className={`flex items-center justify-between px-4 py-3 rounded-lg border ${
+                      r.roundType === "sudden_death"
+                        ? "border-red-200 bg-red-50/50"
+                        : r.roundType === "eliminatie"
+                          ? "border-orange-200 bg-orange-50/50"
+                          : "border-green-200 bg-green-50/50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-bold text-gray-500">
+                        {idx + 1}.
+                      </span>
+                      <span className="font-medium text-navy-800">
+                        {r.name}
+                      </span>
+                      <span
+                        className={`px-2 py-0.5 rounded text-xs font-medium ${
+                          r.roundType === "sudden_death"
+                            ? "bg-red-100 text-red-700"
+                            : r.roundType === "eliminatie"
+                              ? "bg-orange-100 text-orange-700"
+                              : "bg-green-100 text-green-700"
+                        }`}
+                      >
+                        {r.roundType === "sudden_death"
+                          ? "💀 Sudden Death"
+                          : r.roundType === "eliminatie"
+                            ? `🚫 Eliminatie (${r.eliminateCount || 1}/vraag)`
+                            : "🟢 Regulier"}
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        {
+                          questions.filter((q) => (q as any).roundId === r._id)
+                            .length
+                        }{" "}
+                        vragen
+                      </span>
+                    </div>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => {
+                          setRoundForm({
+                            name: r.name,
+                            roundType: r.roundType,
+                            eliminateCount: r.eliminateCount || 1,
+                          });
+                          setEditingRoundId(r._id);
+                          setShowAddRound(true);
+                        }}
+                        className="px-2 py-1 text-blue-600 hover:bg-blue-50 rounded text-sm"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={async () => {
+                          if (!confirm("Ronde verwijderen?")) return;
+                          await deleteRoundMut({ id: r._id });
+                        }}
+                        className="px-2 py-1 text-red-600 hover:bg-red-50 rounded text-sm"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+        )}
+
         {/* Questions section */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-navy-800">Vragen</h2>
@@ -655,6 +915,33 @@ export default function QuizDetailPage() {
                     min={0}
                   />
                 </div>
+                {rounds.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Ronde
+                    </label>
+                    <select
+                      value={form.roundId}
+                      onChange={(e) =>
+                        setForm({ ...form, roundId: e.target.value })
+                      }
+                      className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-400"
+                    >
+                      <option value="">-- Geen ronde --</option>
+                      {rounds.map((r) => (
+                        <option key={r._id} value={r._id}>
+                          {r.name} (
+                          {r.roundType === "sudden_death"
+                            ? "💀"
+                            : r.roundType === "eliminatie"
+                              ? "🚫"
+                              : "🟢"}
+                          )
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
 
               {(form.questionType === "multiple_choice" ||
@@ -1145,134 +1432,180 @@ export default function QuizDetailPage() {
           </Card>
         ) : (
           <div className="space-y-3">
-            {questions.map((q, index) => (
-              <Card key={q._id} className="relative">
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center font-bold text-sm">
-                    {index + 1}
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-navy-800">
-                      {q.questionText}
-                    </p>
-                    <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
-                      <span
-                        className={`px-2 py-0.5 rounded text-xs font-medium ${
-                          q.questionType === "multiple_choice"
-                            ? "bg-blue-100 text-blue-700"
-                            : q.questionType === "multiple_choice_picture"
-                              ? "bg-indigo-100 text-indigo-700"
-                              : q.questionType === "estimation"
-                                ? "bg-orange-100 text-orange-700"
-                                : q.questionType === "ranking"
-                                  ? "bg-teal-100 text-teal-700"
-                                  : q.questionType === "geo"
-                                    ? "bg-emerald-100 text-emerald-700"
-                                    : q.questionType === "matching"
-                                      ? "bg-violet-100 text-violet-700"
-                                      : "bg-amber-100 text-amber-700"
+            {(() => {
+              // Group questions by round
+              let lastRoundId: string | null = null;
+              return questions.map((q, index) => {
+                const qRoundId = (q as any).roundId || null;
+                const showRoundHeader =
+                  rounds.length > 0 && qRoundId !== lastRoundId;
+                lastRoundId = qRoundId;
+                const round = qRoundId
+                  ? rounds.find((r) => r._id === qRoundId)
+                  : null;
+                return (
+                  <div key={q._id}>
+                    {showRoundHeader && (
+                      <div
+                        className={`px-4 py-2 rounded-lg mb-2 mt-4 flex items-center gap-2 ${
+                          round?.roundType === "sudden_death"
+                            ? "bg-red-100 border border-red-200"
+                            : round?.roundType === "eliminatie"
+                              ? "bg-orange-100 border border-orange-200"
+                              : round
+                                ? "bg-green-100 border border-green-200"
+                                : "bg-gray-100 border border-gray-200"
                         }`}
                       >
-                        {q.questionType === "multiple_choice"
-                          ? "Meerkeuze"
-                          : q.questionType === "multiple_choice_picture"
-                            ? "🖼️ Meerkeuze foto"
-                            : q.questionType === "estimation"
-                              ? "📊 Schatting"
-                              : q.questionType === "ranking"
-                                ? "🔢 Rangschikken"
-                                : q.questionType === "geo"
-                                  ? "🗺️ Locatie"
-                                  : q.questionType === "matching"
-                                    ? "🔗 Koppelvraag"
-                                    : "Open"}
-                      </span>
-                      <span>{q.points} punten</span>
-                      <span>{q.timeLimitSeconds}s</span>
-                    </div>
-                    {(q.questionType === "multiple_choice" ||
-                      q.questionType === "multiple_choice_picture") &&
-                      q.options && (
-                        <div className="mt-2 grid grid-cols-2 gap-1">
-                          {q.options.map((opt, i) => (
-                            <div
-                              key={i}
-                              className={`text-sm px-2 py-1 rounded flex items-center gap-2 ${
-                                opt === q.correctAnswer
-                                  ? "bg-green-100 text-green-700 font-medium"
-                                  : "bg-gray-50 text-gray-600"
+                        <span className="font-bold text-sm">
+                          {round
+                            ? `${round.roundType === "sudden_death" ? "💀" : round.roundType === "eliminatie" ? "🚫" : "🟢"} ${round.name}`
+                            : "📋 Zonder ronde"}
+                        </span>
+                        {round && (
+                          <span className="text-xs text-gray-500">
+                            (
+                            {round.roundType === "sudden_death"
+                              ? "Sudden Death"
+                              : round.roundType === "eliminatie"
+                                ? `Eliminatie — ${round.eliminateCount || 1}/vraag`
+                                : "Regulier"}
+                            )
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    <Card className="relative">
+                      <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0 w-8 h-8 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center font-bold text-sm">
+                          {index + 1}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-navy-800">
+                            {q.questionText}
+                          </p>
+                          <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
+                            <span
+                              className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                q.questionType === "multiple_choice"
+                                  ? "bg-blue-100 text-blue-700"
+                                  : q.questionType === "multiple_choice_picture"
+                                    ? "bg-indigo-100 text-indigo-700"
+                                    : q.questionType === "estimation"
+                                      ? "bg-orange-100 text-orange-700"
+                                      : q.questionType === "ranking"
+                                        ? "bg-teal-100 text-teal-700"
+                                        : q.questionType === "geo"
+                                          ? "bg-emerald-100 text-emerald-700"
+                                          : q.questionType === "matching"
+                                            ? "bg-violet-100 text-violet-700"
+                                            : "bg-amber-100 text-amber-700"
                               }`}
                             >
-                              {q.questionType === "multiple_choice_picture" &&
-                                q.optionImageUrls?.[i] && (
-                                  <img
-                                    src={q.optionImageUrls[i]}
-                                    alt={opt}
-                                    className="w-8 h-8 rounded object-cover"
-                                  />
-                                )}
-                              {String.fromCharCode(65 + i)}. {opt}
-                              {opt === q.correctAnswer && " ✓"}
+                              {q.questionType === "multiple_choice"
+                                ? "Meerkeuze"
+                                : q.questionType === "multiple_choice_picture"
+                                  ? "🖼️ Meerkeuze foto"
+                                  : q.questionType === "estimation"
+                                    ? "📊 Schatting"
+                                    : q.questionType === "ranking"
+                                      ? "🔢 Rangschikken"
+                                      : q.questionType === "geo"
+                                        ? "🗺️ Locatie"
+                                        : q.questionType === "matching"
+                                          ? "🔗 Koppelvraag"
+                                          : "Open"}
+                            </span>
+                            <span>{q.points} punten</span>
+                            <span>{q.timeLimitSeconds}s</span>
+                          </div>
+                          {(q.questionType === "multiple_choice" ||
+                            q.questionType === "multiple_choice_picture") &&
+                            q.options && (
+                              <div className="mt-2 grid grid-cols-2 gap-1">
+                                {q.options.map((opt, i) => (
+                                  <div
+                                    key={i}
+                                    className={`text-sm px-2 py-1 rounded flex items-center gap-2 ${
+                                      opt === q.correctAnswer
+                                        ? "bg-green-100 text-green-700 font-medium"
+                                        : "bg-gray-50 text-gray-600"
+                                    }`}
+                                  >
+                                    {q.questionType ===
+                                      "multiple_choice_picture" &&
+                                      q.optionImageUrls?.[i] && (
+                                        <img
+                                          src={q.optionImageUrls[i]}
+                                          alt={opt}
+                                          className="w-8 h-8 rounded object-cover"
+                                        />
+                                      )}
+                                    {String.fromCharCode(65 + i)}. {opt}
+                                    {opt === q.correctAnswer && " ✓"}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          {q.questionType === "open" && (
+                            <p className="mt-1 text-sm text-green-600">
+                              Antwoord: {q.correctAnswer}
+                            </p>
+                          )}
+                          {q.questionType === "estimation" && (
+                            <p className="mt-1 text-sm text-orange-600">
+                              Correct: {q.correctAnswer}
+                              {q.estimationUnit && ` ${q.estimationUnit}`}
+                            </p>
+                          )}
+                          {q.questionType === "ranking" && q.options && (
+                            <div className="mt-1 text-sm text-teal-600">
+                              Volgorde:{" "}
+                              {q.options.map((item, i) => (
+                                <span key={i}>
+                                  {i > 0 && " → "}
+                                  {item}
+                                </span>
+                              ))}
                             </div>
-                          ))}
+                          )}
+                          {q.questionType === "geo" && (
+                            <p className="mt-1 text-sm text-emerald-600">
+                              📍 {q.correctAnswer}
+                            </p>
+                          )}
+                          {q.questionType === "matching" && q.matchingPairs && (
+                            <div className="mt-1 space-y-0.5">
+                              {q.matchingPairs.map((pair, i) => (
+                                <p key={i} className="text-sm text-violet-600">
+                                  {pair.left} → {pair.right}
+                                </p>
+                              ))}
+                            </div>
+                          )}
                         </div>
-                      )}
-                    {q.questionType === "open" && (
-                      <p className="mt-1 text-sm text-green-600">
-                        Antwoord: {q.correctAnswer}
-                      </p>
-                    )}
-                    {q.questionType === "estimation" && (
-                      <p className="mt-1 text-sm text-orange-600">
-                        Correct: {q.correctAnswer}
-                        {q.estimationUnit && ` ${q.estimationUnit}`}
-                      </p>
-                    )}
-                    {q.questionType === "ranking" && q.options && (
-                      <div className="mt-1 text-sm text-teal-600">
-                        Volgorde:{" "}
-                        {q.options.map((item, i) => (
-                          <span key={i}>
-                            {i > 0 && " → "}
-                            {item}
-                          </span>
-                        ))}
+                        {isAdmin && (
+                          <div className="flex gap-1">
+                            <button
+                              onClick={() => startEditQuestion(q)}
+                              className="px-2 py-1 text-blue-600 hover:bg-blue-50 rounded text-sm"
+                            >
+                              ✏️
+                            </button>
+                            <button
+                              onClick={() => handleDeleteQuestion(q._id)}
+                              className="px-2 py-1 text-red-600 hover:bg-red-50 rounded text-sm"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        )}
                       </div>
-                    )}
-                    {q.questionType === "geo" && (
-                      <p className="mt-1 text-sm text-emerald-600">
-                        📍 {q.correctAnswer}
-                      </p>
-                    )}
-                    {q.questionType === "matching" && q.matchingPairs && (
-                      <div className="mt-1 space-y-0.5">
-                        {q.matchingPairs.map((pair, i) => (
-                          <p key={i} className="text-sm text-violet-600">
-                            {pair.left} → {pair.right}
-                          </p>
-                        ))}
-                      </div>
-                    )}
+                    </Card>
                   </div>
-                  {isAdmin && (
-                    <div className="flex gap-1">
-                      <button
-                        onClick={() => startEditQuestion(q)}
-                        className="px-2 py-1 text-blue-600 hover:bg-blue-50 rounded text-sm"
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        onClick={() => handleDeleteQuestion(q._id)}
-                        className="px-2 py-1 text-red-600 hover:bg-red-50 rounded text-sm"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </Card>
-            ))}
+                );
+              });
+            })()}
           </div>
         )}
       </div>

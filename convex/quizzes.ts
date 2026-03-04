@@ -88,6 +88,14 @@ export const deleteQuiz = mutation({
     for (const q of questions) {
       await ctx.db.delete(q._id);
     }
+    // Delete all rounds for this quiz
+    const rounds = await ctx.db
+      .query("quiz_rounds")
+      .withIndex("by_quizId", (q) => q.eq("quizId", args.id))
+      .collect();
+    for (const r of rounds) {
+      await ctx.db.delete(r._id);
+    }
     await ctx.db.delete(args.id);
   },
 });
@@ -107,6 +115,78 @@ export const getStorageUrl = mutation({
   args: { storageId: v.id("_storage") },
   handler: async (ctx, args) => {
     return await ctx.storage.getUrl(args.storageId);
+  },
+});
+
+// ==========================================
+// ROUND CRUD (Admin)
+// ==========================================
+
+export const getRounds = query({
+  args: { quizId: v.id("quizzes") },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("quiz_rounds")
+      .withIndex("by_quizId_order", (q) => q.eq("quizId", args.quizId))
+      .collect();
+  },
+});
+
+export const addRound = mutation({
+  args: {
+    quizId: v.id("quizzes"),
+    name: v.string(),
+    roundType: v.union(
+      v.literal("regular"),
+      v.literal("sudden_death"),
+      v.literal("eliminatie"),
+    ),
+    order: v.number(),
+    eliminateCount: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("quiz_rounds", {
+      quizId: args.quizId,
+      name: args.name,
+      roundType: args.roundType,
+      order: args.order,
+      eliminateCount: args.eliminateCount,
+      createdAt: Date.now(),
+    });
+  },
+});
+
+export const updateRound = mutation({
+  args: {
+    id: v.id("quiz_rounds"),
+    name: v.string(),
+    roundType: v.union(
+      v.literal("regular"),
+      v.literal("sudden_death"),
+      v.literal("eliminatie"),
+    ),
+    order: v.number(),
+    eliminateCount: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...data } = args;
+    await ctx.db.patch(id, data);
+    return id;
+  },
+});
+
+export const deleteRound = mutation({
+  args: { id: v.id("quiz_rounds") },
+  handler: async (ctx, args) => {
+    // Unassign questions from this round
+    const questions = await ctx.db
+      .query("quiz_questions")
+      .withIndex("by_roundId", (q) => q.eq("roundId", args.id))
+      .collect();
+    for (const q of questions) {
+      await ctx.db.patch(q._id, { roundId: undefined });
+    }
+    await ctx.db.delete(args.id);
   },
 });
 
@@ -148,6 +228,7 @@ export const addQuestion = mutation({
     matchingPairs: v.optional(
       v.array(v.object({ left: v.string(), right: v.string() })),
     ),
+    roundId: v.optional(v.id("quiz_rounds")),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("quiz_questions", {
@@ -181,6 +262,7 @@ export const updateQuestion = mutation({
     matchingPairs: v.optional(
       v.array(v.object({ left: v.string(), right: v.string() })),
     ),
+    roundId: v.optional(v.id("quiz_rounds")),
   },
   handler: async (ctx, args) => {
     const { id, ...data } = args;
@@ -279,9 +361,21 @@ export const getSessionByJoinCode = query({
 export const startSession = mutation({
   args: { sessionId: v.id("quiz_sessions") },
   handler: async (ctx, args) => {
+    const session = await ctx.db.get(args.sessionId);
+    if (!session) throw new Error("Session not found");
+
+    // Find the first round (if any)
+    const rounds = await ctx.db
+      .query("quiz_rounds")
+      .withIndex("by_quizId_order", (q) => q.eq("quizId", session.quizId))
+      .collect();
+
+    const firstRound = rounds.length > 0 ? rounds[0] : null;
+
     await ctx.db.patch(args.sessionId, {
       status: "question",
       currentQuestionIndex: 0,
+      currentRoundId: firstRound?._id,
       questionStartedAt: Date.now(),
       updatedAt: Date.now(),
     });
@@ -299,6 +393,43 @@ export const nextQuestion = mutation({
       .withIndex("by_quizId_order", (q) => q.eq("quizId", session.quizId))
       .collect();
 
+    // Get rounds for this quiz
+    const rounds = await ctx.db
+      .query("quiz_rounds")
+      .withIndex("by_quizId_order", (q) => q.eq("quizId", session.quizId))
+      .collect();
+
+    const currentQuestion = questions[session.currentQuestionIndex];
+
+    // --- Elimination logic: after revealing, eliminate bottom players ---
+    if (session.currentRoundId && currentQuestion) {
+      const currentRound = await ctx.db.get(session.currentRoundId);
+      if (currentRound?.roundType === "eliminatie") {
+        // Get all non-eliminated participants
+        const participants = await ctx.db
+          .query("quiz_participants")
+          .withIndex("by_sessionId", (q) => q.eq("sessionId", session._id))
+          .collect();
+        const alive = participants.filter((p) => !p.isEliminated);
+
+        if (alive.length > 1) {
+          const eliminateCount = currentRound.eliminateCount || 1;
+          // Sort by totalScore ascending (lowest first)
+          const sorted = [...alive].sort((a, b) => a.totalScore - b.totalScore);
+          const toEliminate = sorted.slice(
+            0,
+            Math.min(eliminateCount, alive.length - 1),
+          );
+          for (const p of toEliminate) {
+            await ctx.db.patch(p._id, {
+              isEliminated: true,
+              eliminatedInRound: currentRound._id,
+            });
+          }
+        }
+      }
+    }
+
     const nextIndex = session.currentQuestionIndex + 1;
     if (nextIndex >= questions.length) {
       await ctx.db.patch(args.sessionId, {
@@ -306,9 +437,15 @@ export const nextQuestion = mutation({
         updatedAt: Date.now(),
       });
     } else {
+      // Determine which round the next question belongs to
+      const nextQ = questions[nextIndex];
+      let nextRoundId = nextQ.roundId || undefined;
+
+      // If the round changed, update the session
       await ctx.db.patch(args.sessionId, {
         status: "question",
         currentQuestionIndex: nextIndex,
+        currentRoundId: nextRoundId,
         questionStartedAt: Date.now(),
         updatedAt: Date.now(),
       });
@@ -583,6 +720,20 @@ export const submitAnswer = mutation({
       await ctx.db.patch(args.participantId, {
         totalScore: participant.totalScore + pointsAwarded,
       });
+
+      // Sudden death: eliminate on wrong answer
+      if (!isCorrect && session.currentRoundId) {
+        const currentRound = await ctx.db.get(session.currentRoundId);
+        if (
+          currentRound?.roundType === "sudden_death" &&
+          !participant.isEliminated
+        ) {
+          await ctx.db.patch(args.participantId, {
+            isEliminated: true,
+            eliminatedInRound: currentRound._id,
+          });
+        }
+      }
     }
 
     return answerId;
@@ -631,6 +782,15 @@ export const getCurrentQuestion = query({
     const current = questions[session.currentQuestionIndex];
     if (!current) return null;
 
+    // Get current round info
+    let roundInfo: { name: string; roundType: string } | undefined;
+    if (session.currentRoundId) {
+      const round = await ctx.db.get(session.currentRoundId);
+      if (round) {
+        roundInfo = { name: round.name, roundType: round.roundType };
+      }
+    }
+
     // Don't send correct answer to players during active question
     if (session.status === "question") {
       // For matching, send only shuffled right-side options (not the mapping)
@@ -654,6 +814,7 @@ export const getCurrentQuestion = query({
         currentIndex: session.currentQuestionIndex,
         estimationUnit: current.estimationUnit,
         geoZoom: current.geoZoom,
+        roundInfo,
         // For matching: left items + shuffled right items (not the correct mapping)
         matchingPairs:
           current.questionType === "matching" && current.matchingPairs
@@ -680,6 +841,7 @@ export const getCurrentQuestion = query({
       estimationUnit: current.estimationUnit,
       geoZoom: current.geoZoom,
       matchingPairs: current.matchingPairs,
+      roundInfo,
     };
   },
 });

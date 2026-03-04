@@ -62,6 +62,27 @@ export default function LiveQuizPage() {
               Status:{" "}
               <span className="font-semibold capitalize">{session.status}</span>
             </p>
+            {/* Round info */}
+            {currentQuestion?.roundInfo && (
+              <p className="mt-1">
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    currentQuestion.roundInfo.roundType === "sudden_death"
+                      ? "bg-red-500/30 text-red-200"
+                      : currentQuestion.roundInfo.roundType === "eliminatie"
+                        ? "bg-orange-500/30 text-orange-200"
+                        : "bg-green-500/30 text-green-200"
+                  }`}
+                >
+                  {currentQuestion.roundInfo.roundType === "sudden_death"
+                    ? "💀 "
+                    : currentQuestion.roundInfo.roundType === "eliminatie"
+                      ? "🚫 "
+                      : "🟢 "}
+                  {currentQuestion.roundInfo.name}
+                </span>
+              </p>
+            )}
           </div>
           <div className="text-right">
             <p className="text-sm text-purple-300">Deelnamecode</p>
@@ -398,7 +419,12 @@ export default function LiveQuizPage() {
                               ? "🥉"
                               : `${i + 1}.`}
                       </span>
-                      <span className="font-semibold">{p.displayName}</span>
+                      <span
+                        className={`font-semibold ${p.isEliminated ? "line-through opacity-50" : ""}`}
+                      >
+                        {p.displayName}
+                        {p.isEliminated && " 💀"}
+                      </span>
                     </div>
                     <span className="font-bold text-lg">{p.totalScore} pt</span>
                   </div>
@@ -420,10 +446,13 @@ export default function LiveQuizPage() {
                 {leaderboard.slice(0, 10).map((p, i) => (
                   <div
                     key={p._id}
-                    className="flex items-center justify-between px-3 py-1 text-sm"
+                    className={`flex items-center justify-between px-3 py-1 text-sm ${
+                      p.isEliminated ? "opacity-40 line-through" : ""
+                    }`}
                   >
                     <span>
                       {i + 1}. {p.displayName}
+                      {p.isEliminated && " 💀"}
                     </span>
                     <span className="font-mono">{p.totalScore}</span>
                   </div>

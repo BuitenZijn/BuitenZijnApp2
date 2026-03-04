@@ -296,6 +296,25 @@ export default defineSchema({
     .index("by_naam", ["nederlandseNaam"]),
 
   // ==========================================
+  // BUZZ QUIZ: Rounds
+  // ==========================================
+  quiz_rounds: defineTable({
+    quizId: v.id("quizzes"),
+    name: v.string(),
+    roundType: v.union(
+      v.literal("regular"),
+      v.literal("sudden_death"),
+      v.literal("eliminatie"),
+    ),
+    order: v.number(),
+    // For eliminatie: how many players to eliminate per question (0 = bottom player)
+    eliminateCount: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_quizId", ["quizId"])
+    .index("by_quizId_order", ["quizId", "order"]),
+
+  // ==========================================
   // BUZZ QUIZ: Quizzes
   // ==========================================
   quizzes: defineTable({
@@ -363,10 +382,13 @@ export default defineSchema({
     matchingPairs: v.optional(
       v.array(v.object({ left: v.string(), right: v.string() })),
     ),
+    // Optional round assignment
+    roundId: v.optional(v.id("quiz_rounds")),
     createdAt: v.number(),
   })
     .index("by_quizId", ["quizId"])
-    .index("by_quizId_order", ["quizId", "order"]),
+    .index("by_quizId_order", ["quizId", "order"])
+    .index("by_roundId", ["roundId"]),
 
   // ==========================================
   // BUZZ QUIZ: Game sessions (a live game instance)
@@ -383,6 +405,8 @@ export default defineSchema({
     ),
     joinCode: v.string(),
     currentQuestionIndex: v.number(),
+    // Track current round
+    currentRoundId: v.optional(v.id("quiz_rounds")),
     // Timestamp when current question was shown (for timing answers)
     questionStartedAt: v.optional(v.number()),
     createdBy: v.id("users"),
@@ -401,6 +425,8 @@ export default defineSchema({
     userId: v.optional(v.id("users")),
     displayName: v.string(),
     totalScore: v.number(),
+    isEliminated: v.optional(v.boolean()),
+    eliminatedInRound: v.optional(v.id("quiz_rounds")),
     joinedAt: v.number(),
   })
     .index("by_sessionId", ["sessionId"])
