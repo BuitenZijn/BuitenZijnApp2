@@ -2,15 +2,12 @@
   "name": "buitenzijnapp",
   "version": "0.1.0",
   "private": true,
-  "workspaces": [
-    "mobile"
-  ],
   "scripts": {
     "dev": "next dev",
     "dev:web": "next dev",
     "dev:convex": "npx convex dev",
     "dev:mobile": "cd mobile && npx expo start",
-    "dev:all": "concurrently --names \"CONVEX,WEB,MOBILE\" --prefix-colors \"blue,green,magenta\" \"npm run dev:convex\" \"npm run dev:web\" \"npm run dev:mobile\"",
+    "dev:all": "concurrently --names \"CONVEX,WEB,MOBILE\" --prefix-colors \"blue,green,magenta\" \"pnpm run dev:convex\" \"pnpm run dev:web\" \"pnpm run dev:mobile\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
