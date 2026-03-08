@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useAuth } from "@/app/providers";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../../../convex/_generated/api";
+import type { Id } from "../../../../../../convex/_generated/dataModel";
 
 // ── Defaults (used when Convex has no data yet) ─────────────────────
 const DEFAULT_GRID_SIZE = 10;
@@ -100,6 +101,7 @@ export default function MaaltafelPuzzelPage() {
   const convexSettings = useQuery(api.rekenen.getGameSettings, {
     game: "multiplication_grid",
   });
+  const saveScore = useMutation(api.ellaScores.saveScore);
 
   // Resolved settings (Convex or defaults)
   const gridSize = convexSettings?.gridSize ?? DEFAULT_GRID_SIZE;
@@ -115,6 +117,8 @@ export default function MaaltafelPuzzelPage() {
   const [finished, setFinished] = useState(false);
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const mistakesRef = useRef(0);
+  const startTimeRef = useRef(0);
 
   // Rebuild grid when settings change
   useEffect(() => {
@@ -130,6 +134,8 @@ export default function MaaltafelPuzzelPage() {
     setImageSrc(src);
     setFinished(false);
     setInputValues({});
+    mistakesRef.current = 0;
+    startTimeRef.current = Date.now();
 
     // build initial cell states
     const blanks = pickBlanks(blanksPerRound, new Set(), gridSize);
@@ -230,6 +236,19 @@ export default function MaaltafelPuzzelPage() {
               playSound("/ella/sounds/completed.mp3");
               setFinished(true);
               setRemaining(0);
+              // Save score
+              const timeSeconds = Math.round(
+                (Date.now() - startTimeRef.current) / 1000,
+              );
+              if (user?.id) {
+                saveScore({
+                  userId: user.id as Id<"users">,
+                  game: "maaltafel_puzzel",
+                  timeSeconds,
+                  mistakes: mistakesRef.current,
+                  difficulty: `${gridSize}x${gridSize}`,
+                }).catch(() => {});
+              }
             } else {
               // Spawn new blanks
               const solvedSet = new Set<string>();
@@ -249,6 +268,7 @@ export default function MaaltafelPuzzelPage() {
         } else {
           // ── Wrong ──
           playSound("/ella/sounds/fail.mp3");
+          mistakesRef.current += 1;
           const hint = `${row + 1} × ${col + 1} = ?`;
           cell.wrongHint = hint;
           setTimeout(() => {

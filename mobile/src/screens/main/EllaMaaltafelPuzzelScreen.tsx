@@ -20,7 +20,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { Audio } from "expo-av";
 import { api } from "../../../../convex/_generated/api";
 import { useAuth } from "../../contexts/AuthContext";
@@ -121,6 +121,7 @@ export default function EllaMaaltafelPuzzelScreen() {
   const convexSettings = useQuery(api.rekenen.getGameSettings, {
     game: "multiplication_grid",
   });
+  const saveScore = useMutation(api.ellaScores.saveScore);
 
   // Resolved settings
   const gridSize = convexSettings?.gridSize ?? DEFAULT_GRID_SIZE;
@@ -138,6 +139,8 @@ export default function EllaMaaltafelPuzzelScreen() {
   // Bomb animations
   const bombAnims = useRef<Record<string, Animated.Value>>({});
   const correctAnims = useRef<Record<string, Animated.Value>>({});
+  const mistakesRef = useRef(0);
+  const startTimeRef = useRef(0);
 
   // Access check
   const hasAccess =
@@ -159,6 +162,8 @@ export default function EllaMaaltafelPuzzelScreen() {
     setActiveInput(null);
     bombAnims.current = {};
     correctAnims.current = {};
+    mistakesRef.current = 0;
+    startTimeRef.current = Date.now();
 
     const blanks = pickBlanks(blanksPerRound, new Set(), gridSize);
     const blankSet = new Set(blanks.map(([r, c]) => `${r}_${c}`));
@@ -257,6 +262,19 @@ export default function EllaMaaltafelPuzzelScreen() {
               playSound("completed.mp3");
               setFinished(true);
               setRemaining(0);
+              // Save score
+              const timeSeconds = Math.round(
+                (Date.now() - startTimeRef.current) / 1000,
+              );
+              if (user?._id) {
+                saveScore({
+                  userId: user._id,
+                  game: "maaltafel_puzzel",
+                  timeSeconds,
+                  mistakes: mistakesRef.current,
+                  difficulty: `${gridSize}x${gridSize}`,
+                }).catch(() => {});
+              }
             } else {
               const solvedSet = new Set<string>();
               for (let i = 0; i < gridSize; i++)
@@ -275,6 +293,7 @@ export default function EllaMaaltafelPuzzelScreen() {
         } else {
           // ── Wrong ──
           playSound("fail.mp3");
+          mistakesRef.current += 1;
           const hint = `${row + 1} × ${col + 1} = ?`;
           cell.wrongHint = hint;
           setTimeout(() => {

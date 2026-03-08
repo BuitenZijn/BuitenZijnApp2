@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/app/providers";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
+import type { Id } from "../../../../../convex/_generated/dataModel";
 
 // ── Types ────────────────────────────────────────────────────────────
 interface Planet {
@@ -136,6 +137,7 @@ const GRID_OPTIONS = [
   { value: 4, label: "4×4 (Normaal)", emoji: "⭐⭐" },
   { value: 5, label: "5×5 (Moeilijk)", emoji: "⭐⭐⭐" },
   { value: 6, label: "6×6 (Expert)", emoji: "🌟🌟🌟" },
+  { value: 7, label: "7×7 (Meester)", emoji: "🏆🏆🏆" },
 ];
 
 // ── Planet emoji based on nummer ─────────────────────────────────────
@@ -161,6 +163,7 @@ export default function PlanetenPuzzelPage() {
   const planets = useQuery(api.planets.getAll) as Planet[] | undefined;
   const puzzleSettings = useQuery(api.planets.getPuzzleSettings);
   const updateSettings = useMutation(api.planets.updatePuzzleSettings);
+  const saveScore = useMutation(api.ellaScores.saveScore);
 
   // State
   const [selectedPlanet, setSelectedPlanet] = useState<Planet | null>(null);
@@ -178,6 +181,7 @@ export default function PlanetenPuzzelPage() {
   const [swappingPair, setSwappingPair] = useState<[number, number] | null>(
     null,
   );
+  const startTimeRef = useRef<number>(0);
 
   const isAdmin = user?.roles?.includes("admin");
 
@@ -216,6 +220,7 @@ export default function PlanetenPuzzelPage() {
       setSelected(null);
       setSwappingPair(null);
       setLoadingPuzzle(true);
+      startTimeRef.current = Date.now();
 
       try {
         const slicedPieces = await sliceImage(planet.imageUrl, gridSize);
@@ -258,10 +263,33 @@ export default function PlanetenPuzzelPage() {
             // Check if solved
             const isSolved = next.every((v, i) => v === i);
             if (isSolved) {
+              const finalMoves = moves + 1; // current move not yet counted
+              const timeSeconds = Math.round(
+                (Date.now() - startTimeRef.current) / 1000,
+              );
+              const totalPieces = gridSize * gridSize;
+              const stars =
+                finalMoves <= totalPieces
+                  ? 3
+                  : finalMoves <= totalPieces * 2
+                    ? 2
+                    : 1;
               setTimeout(() => {
                 playSound("/ella/sounds/completed.mp3");
                 setCompleted(true);
                 if (selectedPlanet) markCompleted(selectedPlanet._id);
+                // Save score
+                if (user?.id) {
+                  saveScore({
+                    userId: user.id as Id<"users">,
+                    game: "planeten_puzzel",
+                    timeSeconds,
+                    moves: finalMoves,
+                    stars,
+                    difficulty: `${gridSize}x${gridSize}`,
+                    subjectName: selectedPlanet?.nederlandseNaam,
+                  }).catch(() => {});
+                }
                 // Show info after a short delay
                 setTimeout(() => setShowInfo(true), 1500);
               }, 300);

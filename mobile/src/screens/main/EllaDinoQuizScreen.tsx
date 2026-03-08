@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { Audio } from "expo-av";
 import { api } from "../../../../convex/_generated/api";
 import { useAuth } from "../../contexts/AuthContext";
@@ -89,6 +89,7 @@ export default function EllaDinoQuizScreen() {
 
   // Fetch all dinos
   const allDinos = useQuery(api.dinosaurs.getAll) as Dino[] | undefined;
+  const saveScore = useMutation(api.ellaScores.saveScore);
 
   // Game state
   const [phase, setPhase] = useState<GamePhase>("loading");
@@ -97,6 +98,7 @@ export default function EllaDinoQuizScreen() {
   const [choices, setChoices] = useState<string[]>([]);
   const [score, setScore] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const startTimeRef = useRef(0);
 
   // Animations
   const imageScale = useRef(new Animated.Value(0)).current;
@@ -125,6 +127,7 @@ export default function EllaDinoQuizScreen() {
     setScore(0);
     setSelectedAnswer(null);
     setPhase("question");
+    startTimeRef.current = Date.now();
   }, [allDinos]);
 
   // Generate choices whenever currentIndex / queue changes
@@ -271,6 +274,19 @@ export default function EllaDinoQuizScreen() {
     if (next >= queue.length) {
       setPhase("finished");
       playSound("complete.mp3");
+      // Save score
+      const timeSeconds = Math.round(
+        (Date.now() - startTimeRef.current) / 1000,
+      );
+      if (user?._id) {
+        saveScore({
+          userId: user._id,
+          game: "dino_quiz",
+          timeSeconds,
+          correctAnswers: score,
+          totalQuestions: queue.length,
+        }).catch(() => {});
+      }
     } else {
       setCurrentIndex(next);
       setPhase("question");

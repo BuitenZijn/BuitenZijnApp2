@@ -19,6 +19,7 @@ import {
   EllaVariaScreen,
   EllaDinoQuizScreen,
   EllaPlanetPuzzelScreen,
+  EllaResultatenScreen,
   QuizJoinScreen,
   QuizPlayScreen,
 } from "../screens/main";
@@ -158,6 +159,11 @@ export function MainNavigator() {
       <Stack.Screen
         name="EllaPlanetPuzzel"
         component={EllaPlanetPuzzelScreen}
+        options={{ animation: "slide_from_right" }}
+      />
+      <Stack.Screen
+        name="EllaResultaten"
+        component={EllaResultatenScreen}
         options={{ animation: "slide_from_right" }}
       />
       <Stack.Screen

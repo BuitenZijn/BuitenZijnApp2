@@ -451,4 +451,33 @@ export default defineSchema({
     .index("by_participantId", ["participantId"])
     .index("by_session_question", ["sessionId", "questionId"])
     .index("by_session_participant", ["sessionId", "participantId"]),
+
+  // ==========================================
+  // ELLA: Game scores (per-user, per-game)
+  // ==========================================
+  ella_game_scores: defineTable({
+    userId: v.id("users"),
+    game: v.union(
+      v.literal("planeten_puzzel"),
+      v.literal("maaltafel_puzzel"),
+      v.literal("dino_quiz"),
+    ),
+    // Time in seconds to finish the game
+    timeSeconds: v.number(),
+    // Game-specific metrics
+    moves: v.optional(v.number()), // planeten_puzzel: swap count
+    mistakes: v.optional(v.number()), // maaltafel_puzzel: wrong answers
+    correctAnswers: v.optional(v.number()), // dino_quiz: correct count
+    totalQuestions: v.optional(v.number()), // dino_quiz: total dinos
+    stars: v.optional(v.number()), // star rating (1-3)
+    // Context
+    difficulty: v.optional(v.string()), // e.g. "4x4", "5x5"
+    subjectName: v.optional(v.string()), // e.g. planet name, image name
+    // Timestamps
+    completedAt: v.number(),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_game", ["game"])
+    .index("by_userId_game", ["userId", "game"])
+    .index("by_game_completedAt", ["game", "completedAt"]),
 });

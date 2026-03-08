@@ -19,7 +19,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { Audio } from "expo-av";
 import { api } from "../../../../convex/_generated/api";
 import { useAuth } from "../../contexts/AuthContext";
@@ -66,6 +66,8 @@ const GRID_OPTIONS = [
   { value: 3, label: "3×3", emoji: "⭐" },
   { value: 4, label: "4×4", emoji: "⭐⭐" },
   { value: 5, label: "5×5", emoji: "⭐⭐⭐" },
+  { value: 6, label: "6×6", emoji: "🌟🌟🌟" },
+  { value: 7, label: "7×7", emoji: "🏆🏆🏆" },
 ];
 
 // ── Shuffle (Fisher-Yates, ensures not solved) ──────────────────────
@@ -127,6 +129,7 @@ export default function EllaPlanetPuzzelScreen() {
   // Convex data
   const allPlanets = useQuery(api.planets.getAll) as Planet[] | undefined;
   const puzzleSettings = useQuery(api.planets.getPuzzleSettings);
+  const saveScore = useMutation(api.ellaScores.saveScore);
 
   // State
   const [phase, setPhase] = useState<GamePhase>("select");
@@ -142,6 +145,7 @@ export default function EllaPlanetPuzzelScreen() {
   // Animations
   const completionScale = useRef(new Animated.Value(0)).current;
   const starScale = useRef(new Animated.Value(0)).current;
+  const startTimeRef = useRef(0);
 
   const hasAccess =
     user?.roles?.includes("admin") || user?.roles?.includes("ella");
@@ -179,6 +183,7 @@ export default function EllaPlanetPuzzelScreen() {
       const indices = Array.from({ length: total }, (_, i) => i);
       setBoard(shuffleArray(indices));
 
+      startTimeRef.current = Date.now();
       // Small delay for loading state
       setTimeout(() => setPhase("playing"), 300);
     },
@@ -204,6 +209,7 @@ export default function EllaPlanetPuzzelScreen() {
           // Check solved
           const isSolved = next.every((v, i) => v === i);
           if (isSolved) {
+            const finalMoves = moves + 1;
             setTimeout(() => {
               playSound("completed.mp3");
               setPhase("completed");
@@ -213,6 +219,28 @@ export default function EllaPlanetPuzzelScreen() {
                   s.add(selectedPlanet._id);
                   return s;
                 });
+              }
+              // Save score
+              const timeSeconds = Math.round(
+                (Date.now() - startTimeRef.current) / 1000,
+              );
+              const totalPieces = gridSize * gridSize;
+              const stars =
+                finalMoves <= totalPieces
+                  ? 3
+                  : finalMoves <= totalPieces * 2
+                    ? 2
+                    : 1;
+              if (user?._id) {
+                saveScore({
+                  userId: user._id,
+                  game: "planeten_puzzel",
+                  timeSeconds,
+                  moves: finalMoves,
+                  stars,
+                  difficulty: `${gridSize}x${gridSize}`,
+                  subjectName: selectedPlanet?.nederlandseNaam,
+                }).catch(() => {});
               }
 
               // Animate completion
@@ -560,7 +588,11 @@ export default function EllaPlanetPuzzelScreen() {
         {/* Grid size selector */}
         <View style={styles.gridSizeRow}>
           <Text style={styles.gridSizeLabel}>Moeilijkheid:</Text>
-          <View style={styles.gridSizeOptions}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.gridSizeOptions}
+          >
             {GRID_OPTIONS.map((opt) => (
               <TouchableOpacity
                 key={opt.value}
@@ -580,7 +612,7 @@ export default function EllaPlanetPuzzelScreen() {
                 </Text>
               </TouchableOpacity>
             ))}
-          </View>
+          </ScrollView>
         </View>
 
         {/* Progress bar */}
@@ -763,6 +795,7 @@ const styles = StyleSheet.create({
   gridSizeOptions: {
     flexDirection: "row",
     gap: spacing.sm,
+    paddingHorizontal: spacing.sm,
   },
   gridSizeBtn: {
     backgroundColor: "rgba(255,255,255,0.1)",

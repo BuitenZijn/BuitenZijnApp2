@@ -16,6 +16,7 @@ import type * as danceCheckins from "../danceCheckins.js";
 import type * as danceCredits from "../danceCredits.js";
 import type * as danceSessions from "../danceSessions.js";
 import type * as dinosaurs from "../dinosaurs.js";
+import type * as ellaScores from "../ellaScores.js";
 import type * as email from "../email.js";
 import type * as http from "../http.js";
 import type * as knutselen from "../knutselen.js";
@@ -48,6 +49,7 @@ declare const fullApi: ApiFromModules<{
   danceCredits: typeof danceCredits;
   danceSessions: typeof danceSessions;
   dinosaurs: typeof dinosaurs;
+  ellaScores: typeof ellaScores;
   email: typeof email;
   http: typeof http;
   knutselen: typeof knutselen;

@@ -29,6 +29,14 @@ const sections = [
     gradient: "from-indigo-500 to-purple-600",
   },
   {
+    name: "Mijn Resultaten",
+    slug: "resultaten",
+    description: "Bekijk je scores, statistieken en de top 10!",
+    emoji: "📊",
+    available: true,
+    gradient: "from-amber-400 to-orange-500",
+  },
+  {
     name: "Varia",
     slug: "varia",
     description: "Allerlei leuke activiteiten!",

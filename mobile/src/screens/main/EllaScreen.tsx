@@ -46,6 +46,13 @@ const SECTIONS = [
     screen: "EllaVaria" as const,
     gradient: ["#fef3c7", "#fffbeb"],
   },
+  {
+    name: "Mijn Resultaten",
+    emoji: "📊",
+    description: "Scores, statistieken en top 10!",
+    screen: "EllaResultaten" as const,
+    gradient: ["#fed7aa", "#fff7ed"],
+  },
 ];
 
 export default function EllaScreen() {
