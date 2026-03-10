@@ -76,6 +76,13 @@ export default function ActivitiesScreen() {
       color: colors.purple[400],
       onPress: () => navigation.navigate("QuizJoin"),
     },
+    {
+      title: "Prono",
+      description: "Voorspel uitslagen en win!",
+      emoji: "⚽",
+      color: "#10b981",
+      onPress: () => navigation.navigate("Prono"),
+    },
   ];
 
   return (

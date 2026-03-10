@@ -6,6 +6,26 @@ import { api } from "../../../../../../../convex/_generated/api";
 import { useAuth } from "@/app/providers";
 import { Id } from "../../../../../../../convex/_generated/dataModel";
 
+interface Difficulty {
+  id: string;
+  label: string;
+  emoji: string;
+  minNumber: number;
+  maxNumber: number;
+  addition: boolean;
+  subtraction: boolean;
+  multiplication: boolean;
+  division: boolean;
+  fractions: boolean;
+  questionsPerRound: number;
+  timeLimitSeconds: number;
+  pointsPerCorrect: number;
+  speedBonus: number;
+  star1Threshold: number;
+  star2Threshold: number;
+  star3Threshold: number;
+}
+
 export default function AdminEllaRekenenPage() {
   const { user } = useAuth();
 
@@ -22,6 +42,12 @@ export default function AdminEllaRekenenPage() {
   });
   const updateSettings = useMutation(api.rekenen.updateGameSettings);
 
+  // ── Rekenoefeningen settings ──────────────────────────────────────
+  const rekenoefSettings = useQuery(api.rekenoefeningen.getSettings);
+  const updateRekenoefSettings = useMutation(
+    api.rekenoefeningen.updateSettings,
+  );
+
   const [uploading, setUploading] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -33,6 +59,10 @@ export default function AdminEllaRekenenPage() {
     bombChance: number;
   } | null>(null);
   const [settingsSaved, setSettingsSaved] = useState(false);
+
+  // Rekenoefeningen form state
+  const [rekenoefForm, setRekenoefForm] = useState<Difficulty[] | null>(null);
+  const [rekenoefSaved, setRekenoefSaved] = useState(false);
 
   // Initialize settings form when data loads
   const currentSettings = settingsForm ?? gameSettings;
@@ -348,6 +378,302 @@ export default function AdminEllaRekenenPage() {
             </span>
           )}
         </div>
+      </div>
+
+      {/* ── Rekenoefeningen Settings ──────────────────────────────── */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-gray-800 mb-2">
+          ➕ Rekenoefeningen – Moeilijkheidsgraden
+        </h2>
+        <p className="text-xs text-gray-400 mb-4">
+          Configureer de moeilijkheidsgraden voor rekenoefeningen (+, −, ×, ÷,
+          breuken). Kinderen kiezen een niveau voordat ze beginnen.
+        </p>
+
+        {(() => {
+          const difficulties: Difficulty[] =
+            rekenoefForm ?? rekenoefSettings?.difficulties ?? [];
+
+          if (difficulties.length === 0) {
+            return (
+              <div className="text-center py-4 text-gray-400">Laden...</div>
+            );
+          }
+
+          const updateDifficulty = (
+            index: number,
+            field: keyof Difficulty,
+            value: any,
+          ) => {
+            const updated = difficulties.map((d, i) =>
+              i === index ? { ...d, [field]: value } : d,
+            );
+            setRekenoefForm(updated);
+          };
+
+          const handleRekenoefSave = async () => {
+            try {
+              await updateRekenoefSettings({ difficulties });
+              setRekenoefSaved(true);
+              setTimeout(() => setRekenoefSaved(false), 2000);
+            } catch (err: any) {
+              alert(err.message || "Opslaan mislukt");
+            }
+          };
+
+          return (
+            <>
+              <div className="space-y-6">
+                {difficulties.map((diff, idx) => (
+                  <div
+                    key={diff.id}
+                    className="border border-gray-200 rounded-lg p-4"
+                  >
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="text-2xl">{diff.emoji}</span>
+                      <h3 className="text-md font-semibold text-gray-800">
+                        {diff.label}
+                      </h3>
+                      <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
+                        {diff.id}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                      {/* Number range */}
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          Min getal
+                        </label>
+                        <input
+                          type="number"
+                          min={0}
+                          value={diff.minNumber}
+                          onChange={(e) =>
+                            updateDifficulty(
+                              idx,
+                              "minNumber",
+                              parseInt(e.target.value) || 0,
+                            )
+                          }
+                          className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-300 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          Max getal
+                        </label>
+                        <input
+                          type="number"
+                          min={1}
+                          value={diff.maxNumber}
+                          onChange={(e) =>
+                            updateDifficulty(
+                              idx,
+                              "maxNumber",
+                              parseInt(e.target.value) || 10,
+                            )
+                          }
+                          className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-300 outline-none"
+                        />
+                      </div>
+
+                      {/* Questions per round */}
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          Vragen per ronde
+                        </label>
+                        <input
+                          type="number"
+                          min={1}
+                          max={50}
+                          value={diff.questionsPerRound}
+                          onChange={(e) =>
+                            updateDifficulty(
+                              idx,
+                              "questionsPerRound",
+                              parseInt(e.target.value) || 10,
+                            )
+                          }
+                          className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-300 outline-none"
+                        />
+                      </div>
+
+                      {/* Time limit */}
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          Tijdslimiet (sec)
+                        </label>
+                        <input
+                          type="number"
+                          min={0}
+                          max={120}
+                          value={diff.timeLimitSeconds}
+                          onChange={(e) =>
+                            updateDifficulty(
+                              idx,
+                              "timeLimitSeconds",
+                              parseInt(e.target.value) || 0,
+                            )
+                          }
+                          className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-300 outline-none"
+                        />
+                        <p className="text-[10px] text-gray-400 mt-0.5">
+                          0 = geen limiet
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Operations */}
+                    <div className="mt-4">
+                      <label className="block text-xs font-medium text-gray-600 mb-2">
+                        Bewerkingen
+                      </label>
+                      <div className="flex flex-wrap gap-3">
+                        {(
+                          [
+                            ["addition", "➕ Optellen"],
+                            ["subtraction", "➖ Aftrekken"],
+                            ["multiplication", "✖️ Vermenigvuldigen"],
+                            ["division", "➗ Delen"],
+                            ["fractions", "½ Breuken"],
+                          ] as const
+                        ).map(([key, label]) => (
+                          <label
+                            key={key}
+                            className="flex items-center gap-1.5 text-sm cursor-pointer"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={diff[key as keyof Difficulty] as boolean}
+                              onChange={(e) =>
+                                updateDifficulty(idx, key, e.target.checked)
+                              }
+                              className="rounded border-gray-300 text-blue-500 focus:ring-blue-300"
+                            />
+                            {label}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Points & stars */}
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mt-4">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          Punten/juist
+                        </label>
+                        <input
+                          type="number"
+                          min={1}
+                          value={diff.pointsPerCorrect}
+                          onChange={(e) =>
+                            updateDifficulty(
+                              idx,
+                              "pointsPerCorrect",
+                              parseInt(e.target.value) || 10,
+                            )
+                          }
+                          className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-300 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          Snelheidsbonus
+                        </label>
+                        <input
+                          type="number"
+                          min={0}
+                          value={diff.speedBonus}
+                          onChange={(e) =>
+                            updateDifficulty(
+                              idx,
+                              "speedBonus",
+                              parseInt(e.target.value) || 0,
+                            )
+                          }
+                          className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-300 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          ⭐ (% juist)
+                        </label>
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={diff.star1Threshold}
+                          onChange={(e) =>
+                            updateDifficulty(
+                              idx,
+                              "star1Threshold",
+                              parseInt(e.target.value) || 50,
+                            )
+                          }
+                          className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-300 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          ⭐⭐ (% juist)
+                        </label>
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={diff.star2Threshold}
+                          onChange={(e) =>
+                            updateDifficulty(
+                              idx,
+                              "star2Threshold",
+                              parseInt(e.target.value) || 75,
+                            )
+                          }
+                          className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-300 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          ⭐⭐⭐ (% juist)
+                        </label>
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={diff.star3Threshold}
+                          onChange={(e) =>
+                            updateDifficulty(
+                              idx,
+                              "star3Threshold",
+                              parseInt(e.target.value) || 90,
+                            )
+                          }
+                          className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-300 outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-3 mt-6">
+                <button
+                  onClick={handleRekenoefSave}
+                  disabled={!rekenoefForm}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium text-sm"
+                >
+                  Rekenoefeningen opslaan
+                </button>
+                {rekenoefSaved && (
+                  <span className="text-green-600 text-sm font-medium">
+                    ✓ Opgeslagen!
+                  </span>
+                )}
+              </div>
+            </>
+          );
+        })()}
       </div>
     </div>
   );

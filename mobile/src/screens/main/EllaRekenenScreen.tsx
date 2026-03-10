@@ -32,8 +32,8 @@ const GAMES = [
   {
     name: "Rekenoefeningen",
     emoji: "➕",
-    description: "Binnenkort beschikbaar!",
-    screen: null,
+    description: "Oefen met +, −, ×, ÷ en breuken!",
+    screen: "EllaRekenoefeningen" as const,
     gradient: ["#dbeafe", "#eff6ff"],
   },
 ];

@@ -20,7 +20,7 @@ interface User {
   lastName?: string;
   avatarUrl?: string;
   phone?: string;
-  roles: ("admin" | "member" | "guest" | "lijndans" | "ella")[];
+  roles: ("admin" | "member" | "guest" | "lijndans" | "ella" | "prono")[];
   emailVerified: boolean;
   createdAt: number;
   updatedAt: number;

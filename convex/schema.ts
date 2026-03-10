@@ -35,6 +35,7 @@ export default defineSchema({
         v.literal("guest"),
         v.literal("lijndans"),
         v.literal("ella"),
+        v.literal("prono"),
       ),
     ),
     roles: v.optional(
@@ -45,6 +46,7 @@ export default defineSchema({
           v.literal("guest"),
           v.literal("lijndans"),
           v.literal("ella"),
+          v.literal("prono"),
         ),
       ),
     ),
@@ -266,6 +268,42 @@ export default defineSchema({
   }).index("by_game", ["game"]),
 
   // ==========================================
+  // ELLA: Rekenoefeningen settings (singleton)
+  // ==========================================
+  ella_rekenoefeningen_settings: defineTable({
+    // Difficulty presets: easy, medium, hard
+    difficulties: v.array(
+      v.object({
+        id: v.string(),
+        label: v.string(),
+        emoji: v.string(),
+        // Number range
+        minNumber: v.number(),
+        maxNumber: v.number(),
+        // Enabled operations
+        addition: v.boolean(),
+        subtraction: v.boolean(),
+        multiplication: v.boolean(),
+        division: v.boolean(),
+        fractions: v.boolean(),
+        // Questions per round
+        questionsPerRound: v.number(),
+        // Time limit per question in seconds (0 = no limit)
+        timeLimitSeconds: v.number(),
+        // Points per correct answer
+        pointsPerCorrect: v.number(),
+        // Bonus points for speed (within half the time limit)
+        speedBonus: v.number(),
+        // Star thresholds (percentage correct)
+        star1Threshold: v.number(), // e.g. 50
+        star2Threshold: v.number(), // e.g. 75
+        star3Threshold: v.number(), // e.g. 90
+      }),
+    ),
+    updatedAt: v.number(),
+  }),
+
+  // ==========================================
   // ELLA: Dinosaurs
   // ==========================================
   ella_dinosaurs: defineTable({
@@ -461,6 +499,7 @@ export default defineSchema({
       v.literal("planeten_puzzel"),
       v.literal("maaltafel_puzzel"),
       v.literal("dino_quiz"),
+      v.literal("rekenoefeningen"),
     ),
     // Time in seconds to finish the game
     timeSeconds: v.number(),
@@ -480,4 +519,79 @@ export default defineSchema({
     .index("by_game", ["game"])
     .index("by_userId_game", ["userId", "game"])
     .index("by_game_completedAt", ["game", "completedAt"]),
+
+  // ==========================================
+  // PRONO: Competitions (e.g. WK 2026)
+  // ==========================================
+  prono_competitions: defineTable({
+    name: v.string(), // e.g. "WK 2026"
+    description: v.optional(v.string()),
+    emoji: v.optional(v.string()),
+    isActive: v.boolean(),
+    startDate: v.optional(v.string()),
+    endDate: v.optional(v.string()),
+    createdBy: v.id("users"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_active", ["isActive"])
+    .index("by_createdAt", ["createdAt"]),
+
+  // ==========================================
+  // PRONO: Matches within a competition
+  // ==========================================
+  prono_matches: defineTable({
+    competitionId: v.id("prono_competitions"),
+    matchNumber: v.optional(v.number()), // e.g. match 1, 2, 3...
+    homeTeam: v.string(),
+    awayTeam: v.string(),
+    homeFlag: v.optional(v.string()), // emoji flag e.g. "🇧🇪"
+    awayFlag: v.optional(v.string()), // emoji flag e.g. "🇩🇪"
+    matchDate: v.string(), // ISO date
+    matchTime: v.optional(v.string()), // local time e.g. "12:00"
+    belgianTime: v.optional(v.string()), // Belgian time e.g. "21:00"
+    location: v.optional(v.string()), // e.g. "Mexico-Stad"
+    group: v.optional(v.string()), // e.g. "Groep A", "Kwartfinale"
+    homeScore: v.optional(v.number()),
+    awayScore: v.optional(v.number()),
+    isFinished: v.boolean(),
+    pointsExact: v.number(), // points for exact score
+    pointsResult: v.number(), // points for correct result (win/draw/loss)
+    pointsGoalDiff: v.optional(v.number()), // points for correct goal difference
+    createdAt: v.number(),
+  })
+    .index("by_competition", ["competitionId"])
+    .index("by_competition_date", ["competitionId", "matchDate"]),
+
+  // ==========================================
+  // PRONO: User predictions
+  // ==========================================
+  prono_predictions: defineTable({
+    userId: v.id("users"),
+    matchId: v.id("prono_matches"),
+    homeScore: v.number(),
+    awayScore: v.number(),
+    pointsAwarded: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_match", ["matchId"])
+    .index("by_user_match", ["userId", "matchId"]),
+
+  // ==========================================
+  // PRONO: Leaderboard cache (per competition)
+  // ==========================================
+  prono_leaderboard: defineTable({
+    competitionId: v.id("prono_competitions"),
+    userId: v.id("users"),
+    totalPoints: v.number(),
+    exactPredictions: v.number(),
+    correctResults: v.number(),
+    totalPredictions: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_competition", ["competitionId"])
+    .index("by_competition_user", ["competitionId", "userId"])
+    .index("by_competition_points", ["competitionId", "totalPoints"]),
 });

@@ -28,10 +28,10 @@ interface MissionCard {
 
 const MISSION_CARDS: MissionCard[] = [
   {
-    emoji: "🌿",
+    emoji: "🌳",
     title: "Behoud en Promotie Lokale Natuur",
     description:
-      "VZW BuitenZijn zet zich in voor het behoud en promotie van de lokale natuur.",
+      "We zijn er rotsvast van overtuigd dat we terug meer in harmonie moeten leven met de natuur. VZW BuitenZijn probeert dan ook de meeste van haar activiteiten in de natuur te organiseren en zet zich actief in voor het behoud en promotie van de lokale natuur.",
     bgColor: colors.green[50],
     iconBg: colors.green[100],
   },
@@ -67,8 +67,14 @@ const ACTIVITIES = [
     color: colors.blue[500],
   },
   {
+    emoji: "🧹",
+    title: "Opruimacties",
+    description: "Help mee de natuur schoon te maken tijdens onze opruimacties",
+    color: colors.purple[500],
+  },
+  {
     emoji: "🧠",
-    title: "Quiz",
+    title: "BuitenZijn QuizVaganza",
     description: "Onze jaarlijkse quiz-editie",
     color: colors.purple[500],
   },
@@ -97,16 +103,18 @@ export default function AboutScreen() {
             <Text style={styles.heroBadgeText}>VZW</Text>
           </View>
           <Text style={styles.heroTitle}>BuitenZijn</Text>
-          <Text style={styles.heroSubtitle}>Samen buiten zijn</Text>
+          <Text style={styles.heroSubtitle}>Samen Heerlijk BuitenZijn</Text>
         </View>
 
         {/* About */}
         <View style={styles.section}>
           <Text style={styles.aboutText}>
-            VZW BuitenZijn is een vereniging die mensen samenbrengt in de
-            natuur. We organiseren diverse activiteiten zoals lijndansen,
-            fietstochten en quizzen om zo het lokale gemeenschapsleven te
-            verrijken.
+            VZW BuitenZijn is een vereniging die erin gelooft dat mensen te
+            weinig 'buiten zijn'. We organiseren daarom diverse activiteiten
+            zoals lijndansen, fietstochten, quizzen en zo veel meer om zo het
+            lokale gemeenschapsleven te verrijken. Als deze activiteiten ook
+            effectief buiten kunnen plaasvinden, is dat natuurlijk mooi
+            meegenomen!
           </Text>
         </View>
 
@@ -131,7 +139,9 @@ export default function AboutScreen() {
 
         {/* Activities overview */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Onze Activiteiten</Text>
+          <Text style={styles.sectionTitle}>
+            Een greep uit onze Activiteiten
+          </Text>
           {ACTIVITIES.map((act) => (
             <View key={act.title} style={styles.activityRow}>
               <View

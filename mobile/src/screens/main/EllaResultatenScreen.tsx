@@ -41,6 +41,13 @@ const GAMES = [
     scoreLabel: "Juist",
     color: "#10b981",
   },
+  {
+    id: "rekenoefeningen" as const,
+    name: "Rekenoefeningen",
+    emoji: "➕",
+    scoreLabel: "Juist",
+    color: "#4f46e5",
+  },
 ] as const;
 
 type GameId = (typeof GAMES)[number]["id"];

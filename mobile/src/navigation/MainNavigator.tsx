@@ -19,7 +19,10 @@ import {
   EllaVariaScreen,
   EllaDinoQuizScreen,
   EllaPlanetPuzzelScreen,
+  EllaRekenoefenScreen,
   EllaResultatenScreen,
+  PronoScreen,
+  PronoCompetitionScreen,
   QuizJoinScreen,
   QuizPlayScreen,
 } from "../screens/main";
@@ -162,8 +165,23 @@ export function MainNavigator() {
         options={{ animation: "slide_from_right" }}
       />
       <Stack.Screen
+        name="EllaRekenoefeningen"
+        component={EllaRekenoefenScreen}
+        options={{ animation: "slide_from_right" }}
+      />
+      <Stack.Screen
         name="EllaResultaten"
         component={EllaResultatenScreen}
+        options={{ animation: "slide_from_right" }}
+      />
+      <Stack.Screen
+        name="Prono"
+        component={PronoScreen}
+        options={{ animation: "slide_from_right" }}
+      />
+      <Stack.Screen
+        name="PronoCompetition"
+        component={PronoCompetitionScreen}
         options={{ animation: "slide_from_right" }}
       />
       <Stack.Screen

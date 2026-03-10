@@ -16,6 +16,7 @@ import {
   CalculatorIcon,
   GlobeAltIcon,
   PuzzlePieceIcon,
+  TrophyIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth } from "@/app/providers";
 
@@ -74,6 +75,14 @@ const quizNavigation = [
     name: "Quizzen",
     href: "/dashboard/admin/quizzen",
     icon: PuzzlePieceIcon,
+  },
+];
+
+const pronoNavigation = [
+  {
+    name: "Prono",
+    href: "/dashboard/admin/prono",
+    icon: TrophyIcon,
   },
 ];
 
@@ -224,6 +233,35 @@ export function Sidebar() {
                         "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                         isActive
                           ? "bg-purple-50 text-purple-700"
+                          : "text-gray-700 hover:bg-gray-100",
+                      )}
+                    >
+                      <item.icon className="w-5 h-5" />
+                      {item.name}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Prono sub-section */}
+            <div className="pt-4">
+              <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                ⚽ Prono
+              </h3>
+              <div className="mt-2 space-y-1">
+                {pronoNavigation.map((item) => {
+                  const isActive =
+                    pathname === item.href ||
+                    pathname.startsWith(item.href + "/");
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={clsx(
+                        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                        isActive
+                          ? "bg-emerald-50 text-emerald-700"
                           : "text-gray-700 hover:bg-gray-100",
                       )}
                     >

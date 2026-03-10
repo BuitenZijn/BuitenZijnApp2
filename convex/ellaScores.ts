@@ -5,6 +5,7 @@ const GAME_VALIDATOR = v.union(
   v.literal("planeten_puzzel"),
   v.literal("maaltafel_puzzel"),
   v.literal("dino_quiz"),
+  v.literal("rekenoefeningen"),
 );
 
 // ── Save a game score ────────────────────────────────────────────────
@@ -114,7 +115,12 @@ export const getMyStats = query({
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .collect();
 
-    const games = ["planeten_puzzel", "maaltafel_puzzel", "dino_quiz"] as const;
+    const games = [
+      "planeten_puzzel",
+      "maaltafel_puzzel",
+      "dino_quiz",
+      "rekenoefeningen",
+    ] as const;
     const stats: Record<
       string,
       {
@@ -159,7 +165,7 @@ export const getMyStats = query({
           .map((s) => s.mistakes)
           .filter((m): m is number => m != null);
         bestScore = mistakesArr.length > 0 ? Math.min(...mistakesArr) : null;
-      } else if (game === "dino_quiz") {
+      } else if (game === "dino_quiz" || game === "rekenoefeningen") {
         // Higher correct answers is better
         const correctArr = gameScores
           .map((s) => s.correctAnswers)
@@ -236,7 +242,7 @@ function isBetterScore(
       return (a.mistakes ?? Infinity) < (b.mistakes ?? Infinity);
     return a.timeSeconds < b.timeSeconds;
   }
-  if (game === "dino_quiz") {
+  if (game === "dino_quiz" || game === "rekenoefeningen") {
     // More correct → better; tiebreak: faster time
     if ((a.correctAnswers ?? 0) !== (b.correctAnswers ?? 0))
       return (a.correctAnswers ?? 0) > (b.correctAnswers ?? 0);
@@ -273,7 +279,7 @@ function compareScores(
     if (diff !== 0) return diff;
     return a.timeSeconds - b.timeSeconds;
   }
-  if (game === "dino_quiz") {
+  if (game === "dino_quiz" || game === "rekenoefeningen") {
     // Higher correct answers first
     const diff = (b.correctAnswers ?? 0) - (a.correctAnswers ?? 0);
     if (diff !== 0) return diff;

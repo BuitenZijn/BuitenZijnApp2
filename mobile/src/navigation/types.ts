@@ -27,7 +27,10 @@ export type MainStackParamList = {
   EllaVaria: undefined;
   EllaDinoQuiz: undefined;
   EllaPlanetPuzzel: undefined;
+  EllaRekenoefeningen: undefined;
   EllaResultaten: undefined;
+  Prono: undefined;
+  PronoCompetition: { competitionId: string };
   QuizJoin: undefined;
   QuizPlay: { sessionId: string; participantId: string };
 };

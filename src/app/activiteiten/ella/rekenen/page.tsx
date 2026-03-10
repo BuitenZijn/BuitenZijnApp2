@@ -17,7 +17,7 @@ const games = [
     slug: "oefeningen",
     description: "Oefen met optellen, aftrekken, vermenigvuldigen en delen!",
     emoji: "➕",
-    available: false,
+    available: true,
     gradient: "from-blue-400 to-indigo-500",
   },
 ];

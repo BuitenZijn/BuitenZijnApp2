@@ -37,6 +37,8 @@ export default function ActiviteitenPage() {
 
   const showElla =
     user?.roles?.includes("admin") || user?.roles?.includes("ella");
+  const showProno =
+    user?.roles?.includes("admin") || user?.roles?.includes("prono");
 
   return (
     <div className="min-h-screen bg-beige-200 py-12">
@@ -68,6 +70,24 @@ export default function ActiviteitenPage() {
                   </div>
                   <p className="text-pink-600/80">
                     Knutselen, rekenen en meer voor ELLA!
+                  </p>
+                </div>
+              </div>
+            </Link>
+          )}
+
+          {showProno && (
+            <Link href="/activiteiten/prono">
+              <div className="cursor-pointer">
+                <div className="bg-gradient-to-br from-emerald-100 via-green-50 to-teal-100 rounded-xl shadow-md p-6 hover:shadow-lg hover:scale-[1.02] transition-all border border-emerald-200">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-2xl">⚽</span>
+                    <h2 className="text-xl font-semibold text-emerald-700">
+                      Prono
+                    </h2>
+                  </div>
+                  <p className="text-emerald-600/80">
+                    Voorspel de uitslagen en word kampioen!
                   </p>
                 </div>
               </div>

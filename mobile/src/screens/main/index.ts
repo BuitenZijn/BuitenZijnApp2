@@ -15,6 +15,9 @@ export { default as EllaMaaltafelPuzzelScreen } from "./EllaMaaltafelPuzzelScree
 export { default as EllaVariaScreen } from "./EllaVariaScreen";
 export { default as EllaDinoQuizScreen } from "./EllaDinoQuizScreen";
 export { default as EllaPlanetPuzzelScreen } from "./EllaPlanetPuzzelScreen";
+export { default as EllaRekenoefenScreen } from "./EllaRekenoefenScreen";
 export { default as EllaResultatenScreen } from "./EllaResultatenScreen";
+export { default as PronoScreen } from "./PronoScreen";
+export { default as PronoCompetitionScreen } from "./PronoCompetitionScreen";
 export { default as QuizJoinScreen } from "./QuizJoinScreen";
 export { default as QuizPlayScreen } from "./QuizPlayScreen";
