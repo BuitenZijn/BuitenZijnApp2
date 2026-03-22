@@ -25,6 +25,7 @@ export type MainStackParamList = {
   EllaRekenen: undefined;
   EllaMaaltafelPuzzel: undefined;
   EllaVaria: undefined;
+  EllaMemory: undefined;
   EllaDinoQuiz: undefined;
   EllaPlanetPuzzel: undefined;
   EllaRekenoefeningen: undefined;

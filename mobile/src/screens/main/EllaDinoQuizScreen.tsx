@@ -13,7 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useQuery, useMutation } from "convex/react";
-import { Audio } from "expo-av";
+import { createAudioPlayer } from "expo-audio";
 import { api } from "../../../../convex/_generated/api";
 import { useAuth } from "../../contexts/AuthContext";
 import { colors, fontSize, spacing, borderRadius } from "../../styles/theme";
@@ -37,33 +37,10 @@ interface Dino {
 }
 
 // ── Audio helper ────────────────────────────────────────────────────
-let audioModeConfigured = false;
-
-async function ensureAudioMode() {
-  if (audioModeConfigured) return;
-  try {
-    await Audio.setAudioModeAsync({
-      playsInSilentModeIOS: true,
-      shouldDuckAndroid: true,
-    });
-    audioModeConfigured = true;
-  } catch {
-    /* ignore */
-  }
-}
-
 async function playSound(name: string) {
   try {
-    await ensureAudioMode();
-    const { sound } = await Audio.Sound.createAsync(
-      { uri: `${SOUND_BASE}/${name}` },
-      { shouldPlay: true, volume: 1.0 },
-    );
-    sound.setOnPlaybackStatusUpdate((status) => {
-      if ("didJustFinish" in status && status.didJustFinish) {
-        sound.unloadAsync().catch(() => {});
-      }
-    });
+    const player = createAudioPlayer({ uri: `${SOUND_BASE}/${name}` });
+    player.play();
   } catch {
     /* ignore – sounds are optional */
   }

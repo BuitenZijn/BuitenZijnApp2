@@ -404,14 +404,16 @@ export default function MaaltafelPuzzelPage() {
             {/* Column headers */}
             <thead>
               <tr>
-                <th className="bg-gray-100 border border-gray-300 text-xs sm:text-sm font-bold text-gray-600 w-[9%]"></th>
+                <th className="bg-purple-600 border border-purple-700 text-xs sm:text-sm font-extrabold text-white w-[9%] rounded-tl-md">
+                  ×
+                </th>
                 {Array.from({ length: gridSize }, (_, j) => (
                   <th
                     key={j}
-                    className="bg-gray-100 border border-gray-300 text-xs sm:text-sm font-bold text-gray-600"
+                    className="bg-purple-600 border border-purple-700 text-xs sm:text-sm font-extrabold text-white"
                     style={{ width: `${100 / (gridSize + 1)}%` }}
                   >
-                    ×{j + 1}
+                    {j + 1}
                   </th>
                 ))}
               </tr>
@@ -420,8 +422,8 @@ export default function MaaltafelPuzzelPage() {
               {cells.map((row, i) => (
                 <tr key={i}>
                   {/* Row header */}
-                  <th className="bg-gray-100 border border-gray-300 text-xs sm:text-sm font-bold text-gray-600">
-                    ×{i + 1}
+                  <th className="bg-purple-600 border border-purple-700 text-xs sm:text-sm font-extrabold text-white">
+                    {i + 1}
                   </th>
                   {row.map((cell, j) => (
                     <td

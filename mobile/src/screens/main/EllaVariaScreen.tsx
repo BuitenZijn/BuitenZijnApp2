@@ -36,6 +36,13 @@ const GAMES = [
     screen: "EllaPlanetPuzzel" as const,
     gradient: ["#dbeafe", "#eff6ff"],
   },
+  {
+    name: "Memory",
+    emoji: "🧠",
+    description: "Vind alle paren! Kies een thema en moeilijkheid.",
+    screen: "EllaMemory" as const,
+    gradient: ["#fae8ff", "#fdf4ff"],
+  },
 ];
 
 export default function EllaVariaScreen() {

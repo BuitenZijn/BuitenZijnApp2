@@ -6,7 +6,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -31,6 +30,7 @@
       "eas": {
         "projectId": "76a642e8-10cb-47cc-88ee-158ca0ca62b5"
       }
-    }
+    },
+    "plugins": ["expo-secure-store", "expo-audio", "expo-asset"]
   }
 }

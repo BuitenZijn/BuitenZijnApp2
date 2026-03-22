@@ -500,6 +500,7 @@ export default defineSchema({
       v.literal("maaltafel_puzzel"),
       v.literal("dino_quiz"),
       v.literal("rekenoefeningen"),
+      v.literal("memory_game"),
     ),
     // Time in seconds to finish the game
     timeSeconds: v.number(),
@@ -519,6 +520,20 @@ export default defineSchema({
     .index("by_game", ["game"])
     .index("by_userId_game", ["userId", "game"])
     .index("by_game_completedAt", ["game", "completedAt"]),
+
+  // ==========================================
+  // ELLA: Memory Game Themes
+  // ==========================================
+  ella_memory_themes: defineTable({
+    name: v.string(), // e.g. "Dieren", "Eten"
+    emoji: v.string(), // theme icon e.g. "🐾"
+    emojis: v.array(v.string()), // array of emojis in this theme
+    isActive: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_name", ["name"])
+    .index("by_active", ["isActive"]),
 
   // ==========================================
   // PRONO: Competitions (e.g. WK 2026)

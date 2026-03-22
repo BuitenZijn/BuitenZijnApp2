@@ -6,6 +6,7 @@ const GAME_VALIDATOR = v.union(
   v.literal("maaltafel_puzzel"),
   v.literal("dino_quiz"),
   v.literal("rekenoefeningen"),
+  v.literal("memory_game"),
 );
 
 // ── Save a game score ────────────────────────────────────────────────

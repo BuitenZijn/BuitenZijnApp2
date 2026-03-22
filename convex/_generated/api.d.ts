@@ -21,6 +21,7 @@ import type * as email from "../email.js";
 import type * as http from "../http.js";
 import type * as knutselen from "../knutselen.js";
 import type * as lijndances from "../lijndances.js";
+import type * as memoryGame from "../memoryGame.js";
 import type * as migrateRoles from "../migrateRoles.js";
 import type * as planets from "../planets.js";
 import type * as populate_knutselen from "../populate_knutselen.js";
@@ -57,6 +58,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   knutselen: typeof knutselen;
   lijndances: typeof lijndances;
+  memoryGame: typeof memoryGame;
   migrateRoles: typeof migrateRoles;
   planets: typeof planets;
   populate_knutselen: typeof populate_knutselen;

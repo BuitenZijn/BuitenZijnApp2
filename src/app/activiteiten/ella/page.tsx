@@ -41,7 +41,7 @@ const sections = [
     slug: "varia",
     description: "Allerlei leuke activiteiten!",
     emoji: "🌈",
-    available: false,
+    available: true,
     gradient: "from-fuchsia-400 to-pink-500",
   },
 ];

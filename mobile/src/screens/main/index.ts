@@ -13,6 +13,7 @@ export { default as EllaKnutselenScreen } from "./EllaKnutselenScreen";
 export { default as EllaRekenenScreen } from "./EllaRekenenScreen";
 export { default as EllaMaaltafelPuzzelScreen } from "./EllaMaaltafelPuzzelScreen";
 export { default as EllaVariaScreen } from "./EllaVariaScreen";
+export { default as EllaMemoryScreen } from "./EllaMemoryScreen";
 export { default as EllaDinoQuizScreen } from "./EllaDinoQuizScreen";
 export { default as EllaPlanetPuzzelScreen } from "./EllaPlanetPuzzelScreen";
 export { default as EllaRekenoefenScreen } from "./EllaRekenoefenScreen";

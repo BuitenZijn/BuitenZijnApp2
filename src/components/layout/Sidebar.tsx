@@ -68,6 +68,11 @@ const ellaNavigation = [
     href: "/dashboard/admin/ella/planeten",
     icon: GlobeAltIcon,
   },
+  {
+    name: "Memory",
+    href: "/dashboard/admin/ella/memory",
+    icon: PuzzlePieceIcon,
+  },
 ];
 
 const quizNavigation = [
