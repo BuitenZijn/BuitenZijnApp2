@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../../../../convex/_generated/api";
+import { api } from "../../../../../convex/_generated/api";
 import { useAuth } from "@/app/providers";
-import { Id } from "../../../../../../convex/_generated/dataModel";
+import { Id } from "../../../../../convex/_generated/dataModel";
 
 export default function AdminPronoPage() {
   const { user } = useAuth();
@@ -28,7 +28,7 @@ export default function AdminPronoPage() {
   const [newComp, setNewComp] = useState({
     name: "",
     description: "",
-    emoji: "⚽",
+    emoji: "âš½",
     startDate: "",
     endDate: "",
   });
@@ -72,7 +72,7 @@ export default function AdminPronoPage() {
     setNewComp({
       name: "",
       description: "",
-      emoji: "⚽",
+      emoji: "âš½",
       startDate: "",
       endDate: "",
     });
@@ -130,7 +130,7 @@ export default function AdminPronoPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">⚽ Prono Beheer</h1>
+        <h1 className="text-2xl font-bold text-gray-900">âš½ Prono Beheer</h1>
         <p className="text-gray-500 text-sm mt-1">
           Beheer competities, wedstrijden en resultaten
         </p>
@@ -140,7 +140,7 @@ export default function AdminPronoPage() {
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-800">
-            🏆 Competities
+            ðŸ† Competities
           </h2>
           <button
             onClick={() => setShowNewComp(!showNewComp)}
@@ -162,7 +162,7 @@ export default function AdminPronoPage() {
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
               />
               <input
-                placeholder="Emoji (bv. ⚽🏆)"
+                placeholder="Emoji (bv. âš½ðŸ†)"
                 value={newComp.emoji}
                 onChange={(e) =>
                   setNewComp({ ...newComp, emoji: e.target.value })
@@ -218,7 +218,7 @@ export default function AdminPronoPage() {
               onClick={() => setSelectedCompId(comp._id)}
             >
               <div className="flex items-center gap-3">
-                <span className="text-xl">{comp.emoji || "⚽"}</span>
+                <span className="text-xl">{comp.emoji || "âš½"}</span>
                 <div>
                   <span className="font-semibold text-gray-800">
                     {comp.name}
@@ -263,7 +263,7 @@ export default function AdminPronoPage() {
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-800">
-              📋 Wedstrijden
+              ðŸ“‹ Wedstrijden
             </h2>
             <button
               onClick={() => setShowNewMatch(!showNewMatch)}
@@ -293,7 +293,7 @@ export default function AdminPronoPage() {
                   className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
                 />
                 <input
-                  placeholder="🇧🇪 Thuisvlag (emoji)"
+                  placeholder="ðŸ‡§ðŸ‡ª Thuisvlag (emoji)"
                   value={newMatch.homeFlag}
                   onChange={(e) =>
                     setNewMatch({ ...newMatch, homeFlag: e.target.value })
@@ -301,7 +301,7 @@ export default function AdminPronoPage() {
                   className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
                 />
                 <input
-                  placeholder="🇩🇪 Uitvlag (emoji)"
+                  placeholder="ðŸ‡©ðŸ‡ª Uitvlag (emoji)"
                   value={newMatch.awayFlag}
                   onChange={(e) =>
                     setNewMatch({ ...newMatch, awayFlag: e.target.value })
@@ -420,7 +420,7 @@ export default function AdminPronoPage() {
                             : match.matchTime
                               ? ` ${match.matchTime}`
                               : ""}
-                          {match.location && ` · ${match.location}`}
+                          {match.location && ` Â· ${match.location}`}
                         </span>
                       </div>
                       <div className="font-semibold text-gray-800 mt-1">
@@ -460,13 +460,13 @@ export default function AdminPronoPage() {
                                 onClick={handleUpdateResult}
                                 className="px-2 py-1 bg-emerald-500 text-white rounded text-xs"
                               >
-                                ✓
+                                âœ“
                               </button>
                               <button
                                 onClick={() => setResultMatch(null)}
                                 className="px-2 py-1 bg-gray-300 text-gray-700 rounded text-xs"
                               >
-                                ✕
+                                âœ•
                               </button>
                             </div>
                           ) : (
@@ -481,14 +481,14 @@ export default function AdminPronoPage() {
                       )}
                       {match.isFinished && (
                         <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
-                          ✓ Gespeeld
+                          âœ“ Gespeeld
                         </span>
                       )}
                       <button
                         onClick={() => deleteMatch({ id: match._id })}
                         className="text-xs text-red-400 hover:text-red-600"
                       >
-                        🗑️
+                        ðŸ—‘ï¸
                       </button>
                     </div>
                   </div>
@@ -506,3 +506,4 @@ export default function AdminPronoPage() {
     </div>
   );
 }
+

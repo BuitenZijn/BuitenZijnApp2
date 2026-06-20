@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../../../../convex/_generated/api";
+import { api } from "../../../../../convex/_generated/api";
 import { useAuth } from "@/app/providers";
-import { Id } from "../../../../../../convex/_generated/dataModel";
+import { Id } from "../../../../../convex/_generated/dataModel";
 
 export default function AdminSessionsPage() {
   const { user } = useAuth();
@@ -197,7 +197,7 @@ export default function AdminSessionsPage() {
           }}
           className="px-3 py-1 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm"
         >
-          ←
+          â†
         </button>
         <span className="text-lg font-semibold text-gray-900">
           {dutchMonths[month - 1]} {year}
@@ -213,7 +213,7 @@ export default function AdminSessionsPage() {
           }}
           className="px-3 py-1 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm"
         >
-          →
+          â†’
         </button>
       </div>
 
@@ -226,14 +226,14 @@ export default function AdminSessionsPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                      <span className="text-xl">📅</span>
+                      <span className="text-xl">ðŸ“…</span>
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">
                         {session.date}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {session.startTime} - {session.endTime} •{" "}
+                        {session.startTime} - {session.endTime} â€¢{" "}
                         {session.location}
                       </p>
                     </div>
@@ -247,19 +247,19 @@ export default function AdminSessionsPage() {
                       }
                       className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100"
                     >
-                      👥 Aanwezigheid
+                      ðŸ‘¥ Aanwezigheid
                     </button>
                     <button
                       onClick={() => handleRegenerate(session._id)}
                       className="px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-100"
                     >
-                      🔄 QR
+                      ðŸ”„ QR
                     </button>
                     <button
                       onClick={() => handleDelete(session._id)}
                       className="px-3 py-1.5 bg-red-50 text-red-700 rounded-lg text-sm font-medium hover:bg-red-100"
                     >
-                      🗑️
+                      ðŸ—‘ï¸
                     </button>
                   </div>
                 </div>
@@ -325,3 +325,4 @@ export default function AdminSessionsPage() {
     </div>
   );
 }
+

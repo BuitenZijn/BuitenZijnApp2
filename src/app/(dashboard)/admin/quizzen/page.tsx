@@ -1,12 +1,12 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../../../../convex/_generated/api";
+import { api } from "../../../../../convex/_generated/api";
 import { useAuth } from "@/app/providers";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
-import type { Id } from "../../../../../../convex/_generated/dataModel";
+import type { Id } from "../../../../../convex/_generated/dataModel";
 
 export default function AdminQuizzenPage() {
   const { user } = useAuth();
@@ -75,7 +75,7 @@ export default function AdminQuizzenPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">🎯 Buzz Quizzen</h1>
+          <h1 className="text-2xl font-bold text-gray-900">ðŸŽ¯ Buzz Quizzen</h1>
           <p className="text-gray-600">
             Beheer je quizzen, voeg vragen toe en start live sessies
           </p>
@@ -151,7 +151,7 @@ export default function AdminQuizzenPage() {
       ) : quizzes.length === 0 ? (
         <Card>
           <CardContent className="text-center py-12">
-            <div className="text-4xl mb-4">🎯</div>
+            <div className="text-4xl mb-4">ðŸŽ¯</div>
             <p className="text-gray-500 text-lg">
               Nog geen quizzen aangemaakt.
             </p>
@@ -214,7 +214,7 @@ export default function AdminQuizzenPage() {
                       onClick={() => handleStartSession(quiz._id)}
                       className="px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 text-sm font-medium transition-colors"
                     >
-                      ▶ Start Live
+                      â–¶ Start Live
                     </button>
                     <button
                       onClick={() => handleDelete(quiz._id)}
@@ -232,3 +232,4 @@ export default function AdminQuizzenPage() {
     </div>
   );
 }
+

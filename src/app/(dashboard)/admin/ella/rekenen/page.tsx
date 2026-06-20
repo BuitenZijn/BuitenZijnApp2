@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef } from "react";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../../../../../convex/_generated/api";
+import { api } from "../../../../../../convex/_generated/api";
 import { useAuth } from "@/app/providers";
-import { Id } from "../../../../../../../convex/_generated/dataModel";
+import { Id } from "../../../../../../convex/_generated/dataModel";
 
 interface Difficulty {
   id: string;
@@ -29,20 +29,20 @@ interface Difficulty {
 export default function AdminEllaRekenenPage() {
   const { user } = useAuth();
 
-  // ── Puzzle images ─────────────────────────────────────────────────
+  // â”€â”€ Puzzle images â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const puzzleImages = useQuery(api.rekenen.getAllPuzzleImages);
   const generateUploadUrl = useMutation(api.rekenen.generateUploadUrl);
   const addPuzzleImage = useMutation(api.rekenen.addPuzzleImage);
   const toggleImage = useMutation(api.rekenen.togglePuzzleImage);
   const deleteImage = useMutation(api.rekenen.deletePuzzleImage);
 
-  // ── Game settings ─────────────────────────────────────────────────
+  // â”€â”€ Game settings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const gameSettings = useQuery(api.rekenen.getGameSettings, {
     game: "multiplication_grid",
   });
   const updateSettings = useMutation(api.rekenen.updateGameSettings);
 
-  // ── Rekenoefeningen settings ──────────────────────────────────────
+  // â”€â”€ Rekenoefeningen settings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const rekenoefSettings = useQuery(api.rekenoefeningen.getSettings);
   const updateRekenoefSettings = useMutation(
     api.rekenoefeningen.updateSettings,
@@ -71,7 +71,7 @@ export default function AdminEllaRekenenPage() {
     return <div className="text-center py-12 text-gray-500">Geen toegang</div>;
   }
 
-  // ── Upload handler ────────────────────────────────────────────────
+  // â”€â”€ Upload handler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const handleUpload = async (files: FileList) => {
     setUploading(true);
     try {
@@ -135,7 +135,7 @@ export default function AdminEllaRekenenPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
-          🔢 ELLA – Rekenen Beheer
+          ðŸ”¢ ELLA â€“ Rekenen Beheer
         </h1>
         <p className="text-gray-500 text-sm mt-1">
           Beheer puzzelplaatjes en spelinstellingen voor de maaltafel puzzel
@@ -156,7 +156,7 @@ export default function AdminEllaRekenenPage() {
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
           <div className="text-2xl font-bold text-violet-600">
-            {currentSettings?.gridSize ?? 10}×{currentSettings?.gridSize ?? 10}
+            {currentSettings?.gridSize ?? 10}Ã—{currentSettings?.gridSize ?? 10}
           </div>
           <div className="text-sm text-gray-500">Grid grootte</div>
         </div>
@@ -166,7 +166,7 @@ export default function AdminEllaRekenenPage() {
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-800">
-            🖼️ Puzzelplaatjes
+            ðŸ–¼ï¸ Puzzelplaatjes
           </h2>
           <div>
             <input
@@ -188,7 +188,7 @@ export default function AdminEllaRekenenPage() {
         </div>
 
         <p className="text-xs text-gray-400 mb-4">
-          Upload vierkante afbeeldingen (bijv. 1000×1000 px) voor het beste
+          Upload vierkante afbeeldingen (bijv. 1000Ã—1000 px) voor het beste
           resultaat. Het spel kiest willekeurig een actief plaatje.
         </p>
 
@@ -197,8 +197,8 @@ export default function AdminEllaRekenenPage() {
           <div className="text-center py-8 text-gray-400">Laden...</div>
         ) : puzzleImages.length === 0 ? (
           <div className="text-center py-8 text-gray-400">
-            <span className="text-4xl block mb-2">🖼️</span>
-            Nog geen puzzelplaatjes geüpload
+            <span className="text-4xl block mb-2">ðŸ–¼ï¸</span>
+            Nog geen puzzelplaatjes geÃ¼pload
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -219,7 +219,7 @@ export default function AdminEllaRekenenPage() {
                   />
                 ) : (
                   <div className="w-full aspect-square bg-gray-100 flex items-center justify-center text-gray-300 text-3xl">
-                    🖼️
+                    ðŸ–¼ï¸
                   </div>
                 )}
 
@@ -260,7 +260,7 @@ export default function AdminEllaRekenenPage() {
                         onClick={() => setDeleteConfirm(null)}
                         className="text-[10px] bg-gray-400 text-white px-2 py-1 rounded-md font-medium"
                       >
-                        ✕
+                        âœ•
                       </button>
                     </div>
                   ) : (
@@ -268,7 +268,7 @@ export default function AdminEllaRekenenPage() {
                       onClick={() => setDeleteConfirm(img._id)}
                       className="text-[10px] bg-red-500/80 text-white px-2 py-1 rounded-md font-medium hover:bg-red-600 transition"
                     >
-                      🗑️
+                      ðŸ—‘ï¸
                     </button>
                   )}
                 </div>
@@ -286,7 +286,7 @@ export default function AdminEllaRekenenPage() {
       {/* Game Settings */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">
-          ⚙️ Spelinstellingen – Maaltafel Puzzel
+          âš™ï¸ Spelinstellingen â€“ Maaltafel Puzzel
         </h2>
 
         {currentSettings ? (
@@ -310,7 +310,7 @@ export default function AdminEllaRekenenPage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-300 focus:border-purple-300 outline-none"
               />
               <p className="text-xs text-gray-400 mt-1">
-                Bijv. 10 = maaltafels 1-10 (10×10 rooster)
+                Bijv. 10 = maaltafels 1-10 (10Ã—10 rooster)
               </p>
             </div>
 
@@ -356,7 +356,7 @@ export default function AdminEllaRekenenPage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-300 focus:border-purple-300 outline-none"
               />
               <p className="text-xs text-gray-400 mt-1">
-                Kans dat omliggende vakjes ook onthuld worden (💥)
+                Kans dat omliggende vakjes ook onthuld worden (ðŸ’¥)
               </p>
             </div>
           </div>
@@ -374,19 +374,19 @@ export default function AdminEllaRekenenPage() {
           </button>
           {settingsSaved && (
             <span className="text-green-600 text-sm font-medium">
-              ✓ Opgeslagen!
+              âœ“ Opgeslagen!
             </span>
           )}
         </div>
       </div>
 
-      {/* ── Rekenoefeningen Settings ──────────────────────────────── */}
+      {/* â”€â”€ Rekenoefeningen Settings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <h2 className="text-lg font-semibold text-gray-800 mb-2">
-          ➕ Rekenoefeningen – Moeilijkheidsgraden
+          âž• Rekenoefeningen â€“ Moeilijkheidsgraden
         </h2>
         <p className="text-xs text-gray-400 mb-4">
-          Configureer de moeilijkheidsgraden voor rekenoefeningen (+, −, ×, ÷,
+          Configureer de moeilijkheidsgraden voor rekenoefeningen (+, âˆ’, Ã—, Ã·,
           breuken). Kinderen kiezen een niveau voordat ze beginnen.
         </p>
 
@@ -532,11 +532,11 @@ export default function AdminEllaRekenenPage() {
                       <div className="flex flex-wrap gap-3">
                         {(
                           [
-                            ["addition", "➕ Optellen"],
-                            ["subtraction", "➖ Aftrekken"],
-                            ["multiplication", "✖️ Vermenigvuldigen"],
-                            ["division", "➗ Delen"],
-                            ["fractions", "½ Breuken"],
+                            ["addition", "âž• Optellen"],
+                            ["subtraction", "âž– Aftrekken"],
+                            ["multiplication", "âœ–ï¸ Vermenigvuldigen"],
+                            ["division", "âž— Delen"],
+                            ["fractions", "Â½ Breuken"],
                           ] as const
                         ).map(([key, label]) => (
                           <label
@@ -597,7 +597,7 @@ export default function AdminEllaRekenenPage() {
                       </div>
                       <div>
                         <label className="block text-xs font-medium text-gray-600 mb-1">
-                          ⭐ (% juist)
+                          â­ (% juist)
                         </label>
                         <input
                           type="number"
@@ -616,7 +616,7 @@ export default function AdminEllaRekenenPage() {
                       </div>
                       <div>
                         <label className="block text-xs font-medium text-gray-600 mb-1">
-                          ⭐⭐ (% juist)
+                          â­â­ (% juist)
                         </label>
                         <input
                           type="number"
@@ -635,7 +635,7 @@ export default function AdminEllaRekenenPage() {
                       </div>
                       <div>
                         <label className="block text-xs font-medium text-gray-600 mb-1">
-                          ⭐⭐⭐ (% juist)
+                          â­â­â­ (% juist)
                         </label>
                         <input
                           type="number"
@@ -667,7 +667,7 @@ export default function AdminEllaRekenenPage() {
                 </button>
                 {rekenoefSaved && (
                   <span className="text-green-600 text-sm font-medium">
-                    ✓ Opgeslagen!
+                    âœ“ Opgeslagen!
                   </span>
                 )}
               </div>
@@ -678,3 +678,4 @@ export default function AdminEllaRekenenPage() {
     </div>
   );
 }
+

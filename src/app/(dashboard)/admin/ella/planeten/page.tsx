@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef } from "react";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../../../../../convex/_generated/api";
+import { api } from "../../../../../../convex/_generated/api";
 import { useAuth } from "@/app/providers";
-import { Id } from "../../../../../../../convex/_generated/dataModel";
+import { Id } from "../../../../../../convex/_generated/dataModel";
 
 function formatDate(ts: number) {
   return new Date(ts).toLocaleDateString("nl-BE", {
@@ -103,7 +103,7 @@ export default function AdminPlanetsPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
-          🪐 ELLA – Planeten Beheer
+          ðŸª ELLA â€“ Planeten Beheer
         </h1>
         <p className="text-gray-500 text-sm mt-1">
           Bekijk, bewerk en upload foto&apos;s voor de {planets?.length ?? 0}{" "}
@@ -114,7 +114,7 @@ export default function AdminPlanetsPage() {
       {/* Puzzle settings */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
         <h2 className="text-lg font-semibold text-gray-800 mb-3">
-          🧩 Puzzel-instellingen
+          ðŸ§© Puzzel-instellingen
         </h2>
         <div className="flex items-center gap-4 flex-wrap">
           <label className="text-sm text-gray-600 font-medium">
@@ -131,7 +131,7 @@ export default function AdminPlanetsPage() {
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
-                {size}×{size} ({size * size} stukjes)
+                {size}Ã—{size} ({size * size} stukjes)
               </button>
             ))}
           </div>
@@ -184,12 +184,12 @@ export default function AdminPlanetsPage() {
                         className="absolute top-2 right-2 w-7 h-7 bg-red-500/80 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow"
                         title="Verwijder afbeelding"
                       >
-                        ✕
+                        âœ•
                       </button>
                     </>
                   ) : (
                     <div className="text-center">
-                      <span className="text-5xl block mb-2">🪐</span>
+                      <span className="text-5xl block mb-2">ðŸª</span>
                       <span className="text-indigo-400 text-xs">
                         Nog geen foto
                       </span>
@@ -204,7 +204,7 @@ export default function AdminPlanetsPage() {
                     disabled={isUploading}
                     className="absolute bottom-2 right-2 px-3 py-1.5 bg-white/90 hover:bg-white text-indigo-700 rounded-lg text-xs font-medium shadow-sm border border-indigo-200 transition"
                   >
-                    {isUploading ? "Uploaden..." : "📷 Foto uploaden"}
+                    {isUploading ? "Uploaden..." : "ðŸ“· Foto uploaden"}
                   </button>
 
                   <div className="absolute top-2 left-2 w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-bold shadow">
@@ -310,7 +310,7 @@ export default function AdminPlanetsPage() {
                           onClick={() => startEdit(planet)}
                           className="text-blue-500 hover:text-blue-700 text-xs font-medium shrink-0 ml-2"
                         >
-                          ✏️ Bewerken
+                          âœï¸ Bewerken
                         </button>
                       </div>
 
@@ -320,7 +320,7 @@ export default function AdminPlanetsPage() {
                         }
                         className="mt-2 text-xs text-gray-400 hover:text-gray-600 transition"
                       >
-                        {isExpanded ? "▲ Minder info" : "▼ Meer info"}
+                        {isExpanded ? "â–² Minder info" : "â–¼ Meer info"}
                       </button>
 
                       {isExpanded && (
@@ -335,7 +335,7 @@ export default function AdminPlanetsPage() {
                           </div>
                           <div>
                             <span className="text-xs font-medium text-gray-500">
-                              💡 Leuk weetje:
+                              ðŸ’¡ Leuk weetje:
                             </span>
                             <p className="text-sm text-gray-700 mt-0.5">
                               {planet.leukWeetje}
@@ -357,3 +357,4 @@ export default function AdminPlanetsPage() {
     </div>
   );
 }
+

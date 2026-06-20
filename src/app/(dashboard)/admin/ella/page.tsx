@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../../../../convex/_generated/api";
+import { api } from "../../../../../convex/_generated/api";
 import { useAuth } from "@/app/providers";
-import { Id } from "../../../../../../convex/_generated/dataModel";
+import { Id } from "../../../../../convex/_generated/dataModel";
 
 type Categorie =
   | "tekenen"
@@ -16,13 +16,13 @@ type Categorie =
   | "stempelen";
 
 const CATEGORIES: { value: Categorie; label: string; emoji: string }[] = [
-  { value: "tekenen", label: "Tekenen", emoji: "✏️" },
-  { value: "vouwen", label: "Vouwen", emoji: "🦢" },
-  { value: "schilderen", label: "Schilderen", emoji: "🎨" },
-  { value: "verven", label: "Verven", emoji: "🖌️" },
-  { value: "slijm maken", label: "Slijm Maken", emoji: "🧪" },
-  { value: "boetseren", label: "Boetseren", emoji: "🏺" },
-  { value: "stempelen", label: "Stempelen", emoji: "⭐" },
+  { value: "tekenen", label: "Tekenen", emoji: "âœï¸" },
+  { value: "vouwen", label: "Vouwen", emoji: "ðŸ¦¢" },
+  { value: "schilderen", label: "Schilderen", emoji: "ðŸŽ¨" },
+  { value: "verven", label: "Verven", emoji: "ðŸ–Œï¸" },
+  { value: "slijm maken", label: "Slijm Maken", emoji: "ðŸ§ª" },
+  { value: "boetseren", label: "Boetseren", emoji: "ðŸº" },
+  { value: "stempelen", label: "Stempelen", emoji: "â­" },
 ];
 
 const EMPTY_FORM = {
@@ -135,7 +135,7 @@ export default function AdminEllaPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            🎀 ELLA – Knutselen Beheer
+            ðŸŽ€ ELLA â€“ Knutselen Beheer
           </h1>
           <p className="text-gray-500 text-sm mt-1">
             Beheer de YouTube knutselfilmpjes per categorie
@@ -295,7 +295,7 @@ export default function AdminEllaPage() {
             onChange={(e) => setFilterCat(e.target.value)}
             className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-pink-300 focus:border-pink-300 outline-none"
           >
-            <option value="all">Alle categorieën</option>
+            <option value="all">Alle categorieÃ«n</option>
             {CATEGORIES.map((cat) => (
               <option key={cat.value} value={cat.value}>
                 {cat.emoji} {cat.label}
@@ -308,7 +308,7 @@ export default function AdminEllaPage() {
           <div className="p-8 text-center text-gray-400">Laden...</div>
         ) : filteredVideos.length === 0 ? (
           <div className="p-8 text-center text-gray-400">
-            <span className="text-4xl block mb-2">🎬</span>
+            <span className="text-4xl block mb-2">ðŸŽ¬</span>
             Geen filmpjes gevonden
           </div>
         ) : (
@@ -339,7 +339,7 @@ export default function AdminEllaPage() {
                             className="w-20 rounded shadow-sm"
                           />
                         ) : (
-                          <span className="text-gray-300">🎥</span>
+                          <span className="text-gray-300">ðŸŽ¥</span>
                         )}
                       </td>
                       <td className="px-6 py-3">
@@ -409,3 +409,4 @@ export default function AdminEllaPage() {
     </div>
   );
 }
+

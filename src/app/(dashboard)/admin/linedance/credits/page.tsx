@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../../../../../convex/_generated/api";
+import { api } from "../../../../../../convex/_generated/api";
 import { useAuth } from "@/app/providers";
-import { Id } from "../../../../../../../convex/_generated/dataModel";
+import { Id } from "../../../../../../convex/_generated/dataModel";
 
 export default function AdminCreditsPage() {
   const { user } = useAuth();
@@ -80,7 +80,7 @@ export default function AdminCreditsPage() {
     });
   };
 
-  const formatPrice = (cents: number) => `€${(cents / 100).toFixed(2)}`;
+  const formatPrice = (cents: number) => `â‚¬${(cents / 100).toFixed(2)}`;
 
   const formatDate = (ts: number) =>
     new Date(ts).toLocaleDateString("nl-BE", {
@@ -102,7 +102,7 @@ export default function AdminCreditsPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
-          💃 Danskrediet Beheer
+          ðŸ’ƒ Danskrediet Beheer
         </h1>
         <p className="text-gray-600">
           Overzicht van alle danskrediet, pakketten en transacties voor lijndans
@@ -184,7 +184,7 @@ export default function AdminCreditsPage() {
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">
-                Prijs (€)
+                Prijs (â‚¬)
               </label>
               <input
                 type="number"
@@ -218,7 +218,7 @@ export default function AdminCreditsPage() {
               <div>
                 <span className="font-medium text-gray-900">{pkg.name}</span>
                 <span className="ml-2 text-sm text-gray-500">
-                  {pkg.credits} krediet{pkg.credits > 1 ? "en" : ""} —{" "}
+                  {pkg.credits} krediet{pkg.credits > 1 ? "en" : ""} â€”{" "}
                   {formatPrice(pkg.priceInCents)}
                 </span>
               </div>
@@ -346,7 +346,7 @@ export default function AdminCreditsPage() {
                       }}
                       className="text-red-600 hover:text-red-800 text-sm font-medium"
                     >
-                      − Verwijderen
+                      âˆ’ Verwijderen
                     </button>
                   </td>
                 </tr>
@@ -510,7 +510,7 @@ export default function AdminCreditsPage() {
                   <td className="px-6 py-4 text-right text-sm text-gray-500">
                     {p.amountPaidInCents > 0
                       ? formatPrice(p.amountPaidInCents)
-                      : "—"}
+                      : "â€”"}
                   </td>
                 </tr>
               ))}
@@ -531,3 +531,4 @@ export default function AdminCreditsPage() {
     </div>
   );
 }
+

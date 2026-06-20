@@ -1,120 +1,120 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../../../../../convex/_generated/api";
+import { api } from "../../../../../../convex/_generated/api";
 import { useAuth } from "@/app/providers";
-import type { Id } from "../../../../../../../convex/_generated/dataModel";
+import type { Id } from "../../../../../../convex/_generated/dataModel";
 
 const EMOJI_PICKER_SUGGESTIONS = [
-  "🐶",
-  "🐱",
-  "🐭",
-  "🐹",
-  "🐰",
-  "🦊",
-  "🐻",
-  "🐼",
-  "🐨",
-  "🐯",
-  "🦁",
-  "🐮",
-  "🐷",
-  "🐸",
-  "🐵",
-  "🐔",
-  "🐧",
-  "🐦",
-  "🦆",
-  "🦅",
-  "🦉",
-  "🐴",
-  "🦄",
-  "🐝",
-  "🐛",
-  "🦋",
-  "🐌",
-  "🐞",
-  "🐙",
-  "🐠",
-  "🐬",
-  "🐳",
-  "🍎",
-  "🍐",
-  "🍊",
-  "🍋",
-  "🍌",
-  "🍉",
-  "🍇",
-  "🍓",
-  "🫐",
-  "🍒",
-  "🍑",
-  "🥭",
-  "🍍",
-  "🥝",
-  "🍅",
-  "🥑",
-  "🥕",
-  "🌽",
-  "🥦",
-  "🧁",
-  "🍩",
-  "🍪",
-  "🎂",
-  "🍫",
-  "🍬",
-  "🍭",
-  "🍕",
-  "🍔",
-  "⚽",
-  "🏀",
-  "🏈",
-  "⚾",
-  "🎾",
-  "🏐",
-  "🏓",
-  "🏸",
-  "🥊",
-  "🎯",
-  "🏄",
-  "🚴",
-  "🌸",
-  "🌺",
-  "🌻",
-  "🌹",
-  "🌷",
-  "🌵",
-  "🎄",
-  "🌲",
-  "🌳",
-  "🍀",
-  "🍁",
-  "🍂",
-  "☀️",
-  "🌈",
-  "⭐",
-  "🌙",
-  "❄️",
-  "🔥",
-  "💧",
-  "🌊",
-  "🚗",
-  "🚕",
-  "🚙",
-  "🚌",
-  "🏎️",
-  "🚓",
-  "🚑",
-  "🚒",
-  "🚜",
-  "🏍️",
-  "🚲",
-  "🚂",
-  "✈️",
-  "🚀",
-  "🛸",
-  "⛵",
+  "ðŸ¶",
+  "ðŸ±",
+  "ðŸ­",
+  "ðŸ¹",
+  "ðŸ°",
+  "ðŸ¦Š",
+  "ðŸ»",
+  "ðŸ¼",
+  "ðŸ¨",
+  "ðŸ¯",
+  "ðŸ¦",
+  "ðŸ®",
+  "ðŸ·",
+  "ðŸ¸",
+  "ðŸµ",
+  "ðŸ”",
+  "ðŸ§",
+  "ðŸ¦",
+  "ðŸ¦†",
+  "ðŸ¦…",
+  "ðŸ¦‰",
+  "ðŸ´",
+  "ðŸ¦„",
+  "ðŸ",
+  "ðŸ›",
+  "ðŸ¦‹",
+  "ðŸŒ",
+  "ðŸž",
+  "ðŸ™",
+  "ðŸ ",
+  "ðŸ¬",
+  "ðŸ³",
+  "ðŸŽ",
+  "ðŸ",
+  "ðŸŠ",
+  "ðŸ‹",
+  "ðŸŒ",
+  "ðŸ‰",
+  "ðŸ‡",
+  "ðŸ“",
+  "ðŸ«",
+  "ðŸ’",
+  "ðŸ‘",
+  "ðŸ¥­",
+  "ðŸ",
+  "ðŸ¥",
+  "ðŸ…",
+  "ðŸ¥‘",
+  "ðŸ¥•",
+  "ðŸŒ½",
+  "ðŸ¥¦",
+  "ðŸ§",
+  "ðŸ©",
+  "ðŸª",
+  "ðŸŽ‚",
+  "ðŸ«",
+  "ðŸ¬",
+  "ðŸ­",
+  "ðŸ•",
+  "ðŸ”",
+  "âš½",
+  "ðŸ€",
+  "ðŸˆ",
+  "âš¾",
+  "ðŸŽ¾",
+  "ðŸ",
+  "ðŸ“",
+  "ðŸ¸",
+  "ðŸ¥Š",
+  "ðŸŽ¯",
+  "ðŸ„",
+  "ðŸš´",
+  "ðŸŒ¸",
+  "ðŸŒº",
+  "ðŸŒ»",
+  "ðŸŒ¹",
+  "ðŸŒ·",
+  "ðŸŒµ",
+  "ðŸŽ„",
+  "ðŸŒ²",
+  "ðŸŒ³",
+  "ðŸ€",
+  "ðŸ",
+  "ðŸ‚",
+  "â˜€ï¸",
+  "ðŸŒˆ",
+  "â­",
+  "ðŸŒ™",
+  "â„ï¸",
+  "ðŸ”¥",
+  "ðŸ’§",
+  "ðŸŒŠ",
+  "ðŸš—",
+  "ðŸš•",
+  "ðŸš™",
+  "ðŸšŒ",
+  "ðŸŽï¸",
+  "ðŸš“",
+  "ðŸš‘",
+  "ðŸš’",
+  "ðŸšœ",
+  "ðŸï¸",
+  "ðŸš²",
+  "ðŸš‚",
+  "âœˆï¸",
+  "ðŸš€",
+  "ðŸ›¸",
+  "â›µ",
 ];
 
 export default function AdminMemoryPage() {
@@ -216,7 +216,7 @@ export default function AdminMemoryPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">
-            🧠 Memory Thema&apos;s
+            ðŸ§  Memory Thema&apos;s
           </h1>
           <p className="text-gray-500 text-sm mt-1">
             Beheer de thema&apos;s en emoji&apos;s voor het Memory spel
@@ -228,7 +228,7 @@ export default function AdminMemoryPage() {
               onClick={() => seedThemes({})}
               className="px-4 py-2 bg-purple-500 text-white rounded-lg text-sm hover:bg-purple-600 transition-colors"
             >
-              🌱 Standaard thema&apos;s laden
+              ðŸŒ± Standaard thema&apos;s laden
             </button>
           )}
           <button
@@ -271,7 +271,7 @@ export default function AdminMemoryPage() {
                 type="text"
                 value={formEmoji}
                 onChange={(e) => setFormEmoji(e.target.value)}
-                placeholder="bv. 🐾"
+                placeholder="bv. ðŸ¾"
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-fuchsia-300 focus:border-fuchsia-300"
               />
             </div>
@@ -280,7 +280,7 @@ export default function AdminMemoryPage() {
           {/* Emoji list */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Emoji&apos;s ({formEmojis.length}) — minimaal 3 nodig
+              Emoji&apos;s ({formEmojis.length}) â€” minimaal 3 nodig
             </label>
             <div className="flex flex-wrap gap-2 mb-3 min-h-[2.5rem] bg-gray-50 rounded-lg p-3 border">
               {formEmojis.map((emoji, idx) => (
@@ -371,7 +371,7 @@ export default function AdminMemoryPage() {
         </div>
       ) : themes.length === 0 ? (
         <div className="text-center py-12">
-          <div className="text-5xl mb-4">🎨</div>
+          <div className="text-5xl mb-4">ðŸŽ¨</div>
           <p className="text-gray-500">Nog geen thema&apos;s.</p>
           <p className="text-gray-400 text-sm">
             Klik op &quot;Standaard thema&apos;s laden&quot; om te beginnen.
@@ -409,7 +409,7 @@ export default function AdminMemoryPage() {
                     </p>
                   </div>
                   <span className="ml-auto text-gray-300 text-sm">
-                    {expandedTheme === theme._id ? "▲" : "▼"}
+                    {expandedTheme === theme._id ? "â–²" : "â–¼"}
                   </span>
                 </button>
 
@@ -430,7 +430,7 @@ export default function AdminMemoryPage() {
                     onClick={() => startEdit(theme)}
                     className="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs hover:bg-blue-100"
                   >
-                    ✏️ Bewerken
+                    âœï¸ Bewerken
                   </button>
                   {deleteConfirm === theme._id ? (
                     <div className="flex gap-1">
@@ -452,7 +452,7 @@ export default function AdminMemoryPage() {
                       onClick={() => setDeleteConfirm(theme._id)}
                       className="px-3 py-1 bg-red-50 text-red-500 rounded-lg text-xs hover:bg-red-100"
                     >
-                      🗑️
+                      ðŸ—‘ï¸
                     </button>
                   )}
                 </div>
@@ -483,3 +483,4 @@ export default function AdminMemoryPage() {
     </div>
   );
 }
+

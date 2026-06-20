@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../../../../convex/_generated/api";
+import { api } from "../../../../../convex/_generated/api";
 import { useAuth } from "@/app/providers";
-import { Id } from "../../../../../../convex/_generated/dataModel";
+import { Id } from "../../../../../convex/_generated/dataModel";
 
 type RoleType = "admin" | "member" | "guest" | "lijndans" | "ella";
 
@@ -155,7 +155,7 @@ export default function AdminUsersPage() {
   };
 
   const formatDate = (ts?: number) => {
-    if (!ts) return "—";
+    if (!ts) return "â€”";
     return new Date(ts).toLocaleDateString("nl-BE", {
       day: "numeric",
       month: "short",
@@ -164,7 +164,7 @@ export default function AdminUsersPage() {
   };
 
   const formatDateTime = (ts?: number) => {
-    if (!ts) return "—";
+    if (!ts) return "â€”";
     return new Date(ts).toLocaleString("nl-BE", {
       day: "numeric",
       month: "short",
@@ -283,7 +283,7 @@ export default function AdminUsersPage() {
                 const displayName =
                   u.firstName || u.lastName
                     ? `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim()
-                    : (u.name ?? "—");
+                    : (u.name ?? "â€”");
 
                 return (
                   <tr key={u.id} className="hover:bg-gray-50 transition-colors">
@@ -292,7 +292,7 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-4 py-3 text-gray-600">{u.email}</td>
                     <td className="px-4 py-3 text-gray-600">
-                      {u.phone || "—"}
+                      {u.phone || "â€”"}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
@@ -350,7 +350,7 @@ export default function AdminUsersPage() {
                 onClick={() => setEditingUser(null)}
                 className="text-gray-400 hover:text-gray-600 text-xl leading-none"
               >
-                ✕
+                âœ•
               </button>
             </div>
 
@@ -489,3 +489,4 @@ export default function AdminUsersPage() {
     </div>
   );
 }
+

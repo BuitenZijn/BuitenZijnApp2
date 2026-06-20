@@ -265,6 +265,70 @@ const dancesData = [
     song_name: "Back to the Start",
     video_url: "https://youtu.be/D-bDFg5JMos",
   },
+  {
+    lesson_period: "Voorjaar",
+    lesson_year: 2026,
+    dance_name: "Red Hot Salsa",
+    song_artist: "Dave Sheriff",
+    song_name: "Red Hot Salsa",
+    video_url: "https://youtu.be/NgSSdTtk-Ro",
+  },
+  {
+    lesson_period: "Voorjaar",
+    lesson_year: 2026,
+    dance_name: "Love Potion 666",
+    song_artist: "Dj Texx",
+    song_name: "Love Potion 666",
+    video_url: "https://youtu.be/yisVl4HqzoQ",
+  },
+  {
+    lesson_period: "Voorjaar",
+    lesson_year: 2026,
+    dance_name: "The Last Shanty",
+    song_artist: "Patrick Feeney",
+    song_name: "The Last Shanty",
+    video_url: "https://youtu.be/lzsTyhuH3DA",
+  },
+  {
+    lesson_period: "Voorjaar",
+    lesson_year: 2026,
+    dance_name: "Let's Twist Again",
+    song_artist: "Chubby Checker",
+    song_name: "Let's Twist Again",
+    video_url: "https://youtu.be/0h34ZlLfi5I",
+  },
+  {
+    lesson_period: "Voorjaar",
+    lesson_year: 2026,
+    dance_name: "Ding Dong Sing My Song",
+    song_artist: "Michael English",
+    song_name: "Ding Dong Sing My Song",
+    video_url: "https://youtu.be/UVHZZqCQEB8",
+  },
+  {
+    lesson_period: "Voorjaar",
+    lesson_year: 2026,
+    dance_name: "Leaving Liverpool",
+    song_artist: "Shamrock",
+    song_name: "Leaving Liverpool",
+    video_url: "https://youtu.be/wCQwDeBvWrk",
+  },
+  {
+    lesson_period: "Voorjaar",
+    lesson_year: 2026,
+    dance_name: "Achy Breaky Heart (Workout)",
+    song_artist: "Workout Mix",
+    song_name: "Achy Breaky Heart",
+    video_url: "https://youtu.be/wTfEsW3K9EY",
+  },
+  {
+    lesson_period: "Voorjaar",
+    lesson_year: 2026,
+    dance_name: "Zoo",
+    song_artist: "Shakira",
+    song_name: "Zoo",
+    video_url: "https://youtu.be/jWg7gtrOa_s",
+  },
 ];
 
 export const populateLijndances = mutation(async (ctx) => {
@@ -284,4 +348,45 @@ export const populateLijndances = mutation(async (ctx) => {
   }
 
   return { success: true, inserted: dancesData.length };
+});
+
+/**
+ * Adds only dances that don't already exist (matched by dance_name + lesson_period + lesson_year).
+ * Safe to run multiple times — skips duplicates.
+ */
+export const syncNewDances = mutation(async (ctx) => {
+  const now = Date.now();
+  let inserted = 0;
+  let skipped = 0;
+
+  for (const dance of dancesData) {
+    const existing = await ctx.db
+      .query("linedance_dances")
+      .withIndex("by_lesson_period_year", (q) =>
+        q
+          .eq("lesson_period", dance.lesson_period)
+          .eq("lesson_year", dance.lesson_year),
+      )
+      .filter((q) => q.eq(q.field("dance_name"), dance.dance_name))
+      .first();
+
+    if (existing) {
+      skipped++;
+      continue;
+    }
+
+    await ctx.db.insert("linedance_dances", {
+      lesson_period: dance.lesson_period,
+      lesson_year: dance.lesson_year,
+      dance_name: dance.dance_name,
+      song_artist: dance.song_artist,
+      song_name: dance.song_name,
+      video_url: dance.video_url,
+      createdAt: now,
+      updatedAt: now,
+    });
+    inserted++;
+  }
+
+  return { success: true, inserted, skipped };
 });
