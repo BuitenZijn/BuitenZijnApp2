@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { UpcomingEvents } from "@/components/home/UpcomingEvents";
 
@@ -44,16 +45,13 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Missie card 1 */}
               <div className="bg-beige-100 rounded-2xl overflow-hidden shadow-md">
-                <div className="relative h-48 bg-green-200 overflow-hidden">
-                  <video
-                    className="absolute inset-0 w-full h-full object-cover"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                  >
-                    <source src="/natuurbehoud.mp4" type="video/mp4" />
-                  </video>
+                <div className="relative h-48">
+                  <Image
+                    src="/natuur_card.jpg"
+                    alt="Behoud en promotie lokale natuur"
+                    fill
+                    className="object-cover"
+                  />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-navy-800 mb-2">
@@ -68,20 +66,13 @@ export default function HomePage() {
 
               {/* Missie card 2 */}
               <div className="bg-beige-100 rounded-2xl overflow-hidden shadow-md">
-                <div className="h-48 bg-blue-200 flex items-center justify-center">
-                  <svg
-                    className="w-16 h-16 text-blue-600/50"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                    />
-                  </svg>
+                <div className="relative h-48">
+                  <Image
+                    src="/welzijn_card.jpg"
+                    alt="Welzijn lokale bevolking"
+                    fill
+                    className="object-cover"
+                  />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-navy-800 mb-2">
@@ -97,20 +88,13 @@ export default function HomePage() {
 
               {/* Missie card 3 */}
               <div className="bg-beige-100 rounded-2xl overflow-hidden shadow-md">
-                <div className="h-48 bg-yellow-200 flex items-center justify-center">
-                  <svg
-                    className="w-16 h-16 text-yellow-600/50"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                    />
-                  </svg>
+                <div className="relative h-48">
+                  <Image
+                    src="/cultuur_card.png"
+                    alt="Stimuleren lokale cultuur"
+                    fill
+                    className="object-cover"
+                  />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-navy-800 mb-2">

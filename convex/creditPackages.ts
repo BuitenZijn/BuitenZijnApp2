@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin } from "./authUtils";
 
 // ==========================================
 // QUERIES
@@ -49,11 +50,13 @@ export const get = query({
  */
 export const create = mutation({
   args: {
+    sessionToken: v.string(),
     name: v.string(),
     credits: v.number(),
     priceInCents: v.number(),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     const id = await ctx.db.insert("linedance_credit_packages", {
       name: args.name,
       credits: args.credits,
@@ -70,6 +73,7 @@ export const create = mutation({
  */
 export const update = mutation({
   args: {
+    sessionToken: v.string(),
     packageId: v.id("linedance_credit_packages"),
     name: v.optional(v.string()),
     credits: v.optional(v.number()),
@@ -77,7 +81,9 @@ export const update = mutation({
     isActive: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    const { packageId, ...updates } = args;
+    await requireAdmin(ctx, args.sessionToken);
+    const { sessionToken: _t, packageId, ...updates } = args;
+    void _t;
     const clean: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(updates)) {
       if (value !== undefined) clean[key] = value;
@@ -93,8 +99,12 @@ export const update = mutation({
  * Deactivate a credit package (soft delete)
  */
 export const deactivate = mutation({
-  args: { packageId: v.id("linedance_credit_packages") },
+  args: {
+    sessionToken: v.string(),
+    packageId: v.id("linedance_credit_packages"),
+  },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     await ctx.db.patch(args.packageId, { isActive: false });
     return { success: true };
   },

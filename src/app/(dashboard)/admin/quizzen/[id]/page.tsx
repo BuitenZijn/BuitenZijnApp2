@@ -301,7 +301,7 @@ export default function DashboardQuizDetailPage() {
     <div className="space-y-6">
       {/* Back link */}
       <button
-        onClick={() => router.push("/dashboard/admin/quizzen")}
+        onClick={() => router.push("/admin/quizzen")}
         className="text-purple-600 hover:text-purple-800 inline-flex items-center gap-1 text-sm font-medium"
       >
         ← Terug naar Quizzen

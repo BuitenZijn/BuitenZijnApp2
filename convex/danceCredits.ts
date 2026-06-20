@@ -1,5 +1,6 @@
 import { query, mutation, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin } from "./authUtils";
 
 // ==========================================
 // QUERIES
@@ -51,9 +52,11 @@ export const getPurchaseHistory = query({
  */
 export const getAllPurchases = query({
   args: {
+    sessionToken: v.string(),
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     const limit = args.limit ?? 200;
     const purchases = await ctx.db
       .query("linedance_credit_purchases")
@@ -82,8 +85,9 @@ export const getAllPurchases = query({
  * Get all users with their credit balances (admin)
  */
 export const getAllBalances = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { sessionToken: v.string() },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     const creditRecords = await ctx.db.query("linedance_credits").collect();
 
     const enriched = await Promise.all(
@@ -109,8 +113,9 @@ export const getAllBalances = query({
  * Get all users with 'lijndans' role, including those without credits (admin)
  */
 export const getAllLijndansUsers = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { sessionToken: v.string() },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     // Get all users
     const allUsers = await ctx.db.query("users").collect();
 
@@ -149,6 +154,7 @@ export const getAllLijndansUsers = query({
  */
 export const addCredits = mutation({
   args: {
+    sessionToken: v.string(),
     userId: v.id("users"),
     credits: v.number(),
     paymentMethod: v.union(
@@ -162,6 +168,7 @@ export const addCredits = mutation({
     note: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     const now = Date.now();
 
     // Update or create balance
@@ -250,11 +257,13 @@ export const internalAddCredits = internalMutation({
  */
 export const removeCredits = mutation({
   args: {
+    sessionToken: v.string(),
     userId: v.id("users"),
     credits: v.number(),
     note: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     const existing = await ctx.db
       .query("linedance_credits")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))

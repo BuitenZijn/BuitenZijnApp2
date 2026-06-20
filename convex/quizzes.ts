@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin, getAuthenticatedUser } from "./authUtils";
 
 // ==========================================
 // QUIZ CRUD (Admin)
@@ -25,11 +26,13 @@ export const getActiveQuizzes = query(async (ctx) => {
 
 export const createQuiz = mutation({
   args: {
+    sessionToken: v.string(),
     title: v.string(),
     description: v.optional(v.string()),
     createdBy: v.id("users"),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     const now = Date.now();
     return await ctx.db.insert("quizzes", {
       title: args.title,
@@ -44,6 +47,7 @@ export const createQuiz = mutation({
 
 export const updateQuiz = mutation({
   args: {
+    sessionToken: v.string(),
     id: v.id("quizzes"),
     title: v.string(),
     description: v.optional(v.string()),
@@ -63,6 +67,7 @@ export const updateQuiz = mutation({
     ),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     await ctx.db.patch(args.id, {
       title: args.title,
       description: args.description,
@@ -78,8 +83,9 @@ export const updateQuiz = mutation({
 });
 
 export const deleteQuiz = mutation({
-  args: { id: v.id("quizzes") },
+  args: { sessionToken: v.string(), id: v.id("quizzes") },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     // Delete all questions for this quiz
     const questions = await ctx.db
       .query("quiz_questions")
@@ -105,15 +111,18 @@ export const deleteQuiz = mutation({
 // ==========================================
 
 export const generateUploadUrl = mutation({
-  handler: async (ctx) => {
+  args: { sessionToken: v.string() },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     return await ctx.storage.generateUploadUrl();
   },
 });
 
 /** Convert a storageId to a public URL */
 export const getStorageUrl = mutation({
-  args: { storageId: v.id("_storage") },
+  args: { sessionToken: v.string(), storageId: v.id("_storage") },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     return await ctx.storage.getUrl(args.storageId);
   },
 });
@@ -134,6 +143,7 @@ export const getRounds = query({
 
 export const addRound = mutation({
   args: {
+    sessionToken: v.string(),
     quizId: v.id("quizzes"),
     name: v.string(),
     roundType: v.union(
@@ -145,6 +155,7 @@ export const addRound = mutation({
     eliminateCount: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     return await ctx.db.insert("quiz_rounds", {
       quizId: args.quizId,
       name: args.name,
@@ -158,6 +169,7 @@ export const addRound = mutation({
 
 export const updateRound = mutation({
   args: {
+    sessionToken: v.string(),
     id: v.id("quiz_rounds"),
     name: v.string(),
     roundType: v.union(
@@ -169,15 +181,18 @@ export const updateRound = mutation({
     eliminateCount: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const { id, ...data } = args;
+    await requireAdmin(ctx, args.sessionToken);
+    const { sessionToken: _t, id, ...data } = args;
+    void _t;
     await ctx.db.patch(id, data);
     return id;
   },
 });
 
 export const deleteRound = mutation({
-  args: { id: v.id("quiz_rounds") },
+  args: { sessionToken: v.string(), id: v.id("quiz_rounds") },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     // Unassign questions from this round
     const questions = await ctx.db
       .query("quiz_questions")
@@ -206,6 +221,7 @@ export const getQuestions = query({
 
 export const addQuestion = mutation({
   args: {
+    sessionToken: v.string(),
     quizId: v.id("quizzes"),
     questionText: v.string(),
     questionType: v.union(
@@ -231,8 +247,11 @@ export const addQuestion = mutation({
     roundId: v.optional(v.id("quiz_rounds")),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
+    const { sessionToken: _t, ...rest } = args;
+    void _t;
     return await ctx.db.insert("quiz_questions", {
-      ...args,
+      ...rest,
       createdAt: Date.now(),
     });
   },
@@ -240,6 +259,7 @@ export const addQuestion = mutation({
 
 export const updateQuestion = mutation({
   args: {
+    sessionToken: v.string(),
     id: v.id("quiz_questions"),
     questionText: v.string(),
     questionType: v.union(
@@ -265,15 +285,18 @@ export const updateQuestion = mutation({
     roundId: v.optional(v.id("quiz_rounds")),
   },
   handler: async (ctx, args) => {
-    const { id, ...data } = args;
+    await requireAdmin(ctx, args.sessionToken);
+    const { sessionToken: _t, id, ...data } = args;
+    void _t;
     await ctx.db.patch(id, data);
     return id;
   },
 });
 
 export const deleteQuestion = mutation({
-  args: { id: v.id("quiz_questions") },
+  args: { sessionToken: v.string(), id: v.id("quiz_questions") },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     await ctx.db.delete(args.id);
   },
 });
@@ -284,19 +307,19 @@ export const deleteQuestion = mutation({
 
 function generateJoinCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code = "";
-  for (let i = 0; i < 6; i++) {
-    code += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return code;
+  const array = new Uint8Array(6);
+  crypto.getRandomValues(array);
+  return Array.from(array, (b) => chars[b % chars.length]).join("");
 }
 
 export const createSession = mutation({
   args: {
+    sessionToken: v.string(),
     quizId: v.id("quizzes"),
     createdBy: v.id("users"),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     const now = Date.now();
     const joinCode = generateJoinCode();
     return await ctx.db.insert("quiz_sessions", {

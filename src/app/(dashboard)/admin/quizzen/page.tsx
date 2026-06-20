@@ -43,12 +43,18 @@ export default function AdminQuizzenPage() {
   };
 
   const handleDelete = async (id: Id<"quizzes">) => {
-    if (!confirm("Weet je zeker dat je deze quiz wilt verwijderen? Alle vragen worden ook verwijderd."))
+    if (
+      !confirm(
+        "Weet je zeker dat je deze quiz wilt verwijderen? Alle vragen worden ook verwijderd.",
+      )
+    )
       return;
     await deleteQuiz({ id });
   };
 
-  const handleToggleActive = async (quiz: NonNullable<typeof quizzes>[number]) => {
+  const handleToggleActive = async (
+    quiz: NonNullable<typeof quizzes>[number],
+  ) => {
     await updateQuiz({
       id: quiz._id,
       title: quiz.title,
@@ -199,7 +205,7 @@ export default function AdminQuizzenPage() {
                       {quiz.isActive ? "Deactiveren" : "Activeren"}
                     </button>
                     <Link
-                      href={`/dashboard/admin/quizzen/${quiz._id}`}
+                      href={`/admin/quizzen/${quiz._id}`}
                       className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 text-sm font-medium transition-colors"
                     >
                       Vragen bewerken

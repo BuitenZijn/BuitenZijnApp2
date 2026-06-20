@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,30 +8,34 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-} from 'react-native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useAuth } from '../../contexts/AuthContext';
-import { Button, Input, PasswordInput } from '../../components/ui';
-import { colors, fontSize, fontWeight, spacing } from '../../styles/theme';
-import { AuthStackParamList } from '../../navigation/types';
+} from "react-native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useAuth } from "../../contexts/AuthContext";
+import { Button, Input, PasswordInput } from "../../components/ui";
+import { colors, fontSize, fontWeight, spacing } from "../../styles/theme";
+import { AuthStackParamList } from "../../navigation/types";
 
 type Props = {
-  navigation: NativeStackNavigationProp<AuthStackParamList, 'Login'>;
+  navigation: NativeStackNavigationProp<AuthStackParamList, "Login">;
 };
 
 export default function LoginScreen({ navigation }: Props) {
   const { login } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
+    {},
+  );
 
   const validate = () => {
     const newErrors: typeof errors = {};
-    if (!email.trim()) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = 'Invalid email address';
-    if (!password) newErrors.password = 'Password is required';
-    else if (password.length < 6) newErrors.password = 'Password must be at least 6 characters';
+    if (!email.trim()) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(email))
+      newErrors.email = "Invalid email address";
+    if (!password) newErrors.password = "Password is required";
+    else if (password.length < 8)
+      newErrors.password = "Password must be at least 8 characters";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -40,13 +44,16 @@ export default function LoginScreen({ navigation }: Props) {
     if (!validate()) return;
     setLoading(true);
     try {
-      // In production, hash the password properly before sending
+      // Password is hashed server-side with bcrypt (see authActions.ts)
       const result = await login(email.trim().toLowerCase(), password);
       if (!result.success) {
-        Alert.alert('Login Failed', result.error || 'Invalid email or password');
+        Alert.alert(
+          "Login Failed",
+          result.error || "Invalid email or password",
+        );
       }
     } catch {
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      Alert.alert("Error", "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -55,7 +62,7 @@ export default function LoginScreen({ navigation }: Props) {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -88,7 +95,7 @@ export default function LoginScreen({ navigation }: Props) {
           />
 
           <TouchableOpacity
-            onPress={() => navigation.navigate('ForgotPassword')}
+            onPress={() => navigation.navigate("ForgotPassword")}
             style={styles.forgotLink}
           >
             <Text style={styles.linkText}>Forgot password?</Text>
@@ -105,7 +112,7 @@ export default function LoginScreen({ navigation }: Props) {
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>Don't have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+          <TouchableOpacity onPress={() => navigation.navigate("Register")}>
             <Text style={styles.linkText}>Sign Up</Text>
           </TouchableOpacity>
         </View>
@@ -121,22 +128,22 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
-    paddingHorizontal: spacing['2xl'],
-    paddingVertical: spacing['3xl'],
+    justifyContent: "center",
+    paddingHorizontal: spacing["2xl"],
+    paddingVertical: spacing["3xl"],
   },
   header: {
-    alignItems: 'center',
-    marginBottom: spacing['3xl'],
+    alignItems: "center",
+    marginBottom: spacing["3xl"],
   },
   logo: {
-    fontSize: fontSize['3xl'],
+    fontSize: fontSize["3xl"],
     fontWeight: fontWeight.bold,
     color: colors.green[500],
     marginBottom: spacing.lg,
   },
   title: {
-    fontSize: fontSize['2xl'],
+    fontSize: fontSize["2xl"],
     fontWeight: fontWeight.bold,
     color: colors.text,
     marginBottom: spacing.xs,
@@ -146,10 +153,10 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   form: {
-    marginBottom: spacing['2xl'],
+    marginBottom: spacing["2xl"],
   },
   forgotLink: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     marginBottom: spacing.xl,
     marginTop: -spacing.sm,
   },
@@ -159,9 +166,9 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
   },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
   footerText: {
     color: colors.textSecondary,

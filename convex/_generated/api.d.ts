@@ -10,6 +10,7 @@
 
 import type * as auth from "../auth.js";
 import type * as authActions from "../authActions.js";
+import type * as authUtils from "../authUtils.js";
 import type * as contact from "../contact.js";
 import type * as creditPackages from "../creditPackages.js";
 import type * as danceCheckins from "../danceCheckins.js";
@@ -34,6 +35,7 @@ import type * as seedCreditPackages from "../seedCreditPackages.js";
 import type * as seedDinosaurs from "../seedDinosaurs.js";
 import type * as seedPlanets from "../seedPlanets.js";
 import type * as seedWK2026 from "../seedWK2026.js";
+import type * as shop from "../shop.js";
 import type * as stripe from "../stripe.js";
 import type * as stripeHelpers from "../stripeHelpers.js";
 import type * as users from "../users.js";
@@ -47,6 +49,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   authActions: typeof authActions;
+  authUtils: typeof authUtils;
   contact: typeof contact;
   creditPackages: typeof creditPackages;
   danceCheckins: typeof danceCheckins;
@@ -71,6 +74,7 @@ declare const fullApi: ApiFromModules<{
   seedDinosaurs: typeof seedDinosaurs;
   seedPlanets: typeof seedPlanets;
   seedWK2026: typeof seedWK2026;
+  shop: typeof shop;
   stripe: typeof stripe;
   stripeHelpers: typeof stripeHelpers;
   users: typeof users;

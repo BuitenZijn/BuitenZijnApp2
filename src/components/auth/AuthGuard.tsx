@@ -25,7 +25,7 @@ export function AuthGuard({ children, requireAdmin = false }: AuthGuardProps) {
       if (!isAuthenticated) {
         router.push("/login");
       } else if (requireAdmin && !user?.roles?.includes("admin")) {
-        router.push("/dashboard");
+        router.push("/admin");
       }
     }
   }, [isLoading, isAuthenticated, user, requireAdmin, router]);

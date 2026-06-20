@@ -228,13 +228,13 @@ export function UpcomingEvents() {
       {/* Events list */}
       {!loading &&
         !error &&
-        events.map((event) => {
+        events.map((event, index) => {
           const description = cleanDescription(event.description);
           const location = shortenLocation(event.location);
 
           return (
             <div
-              key={event.uid}
+              key={`${event.uid}-${event.start || index}`}
               className="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition border-l-4 border-green-500"
             >
               <h4 className="font-semibold text-navy-800 text-lg">

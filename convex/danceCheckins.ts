@@ -1,6 +1,7 @@
 import { mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
+import { requireSelf } from "./authUtils";
 
 /**
  * Check in to a dance session by scanning QR code.
@@ -8,10 +9,13 @@ import { v } from "convex/values";
  */
 export const checkIn = mutation({
   args: {
+    sessionToken: v.string(),
     userId: v.id("users"),
     qrToken: v.string(),
   },
   handler: async (ctx, args) => {
+    // Verify the caller owns this userId
+    await requireSelf(ctx, args.sessionToken, args.userId);
     // 1. Find session by QR token
     const session = await ctx.db
       .query("linedance_sessions")

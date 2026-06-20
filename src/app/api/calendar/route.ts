@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { RRule, rrulestr } from "rrule";
 
-const ICAL_URL =
-  "https://calendar.google.com/calendar/ical/9ef0a6fbfc25f5fcdd5b23ed3afd9cc245f3b2d67e6398d88ab3b1be27a80d02%40group.calendar.google.com/private-072b47e44bb5fc643946ccb35de02102/basic.ics";
+const ICAL_URL = process.env.GOOGLE_CALENDAR_ICAL_URL ?? "";
 
 interface CalendarEvent {
   summary: string;

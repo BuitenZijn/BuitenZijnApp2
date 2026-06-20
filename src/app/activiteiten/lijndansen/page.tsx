@@ -9,6 +9,7 @@ import {
   ArrowTopRightOnSquareIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function LijndansenPage() {
   return (
@@ -105,6 +106,16 @@ export default function LijndansenPage() {
           <p className="text-green-800">
             Nieuwkomers mogen hun eerste les gratis proberen
           </p>
+        </div>
+
+        <div className="relative w-full rounded-xl overflow-hidden shadow-md">
+          <Image
+            src="/lijndans_poster.png"
+            alt="Lijndansen poster"
+            width={800}
+            height={600}
+            className="w-full h-auto object-contain"
+          />
         </div>
       </div>
     </div>

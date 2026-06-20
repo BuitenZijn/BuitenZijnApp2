@@ -45,8 +45,13 @@ export const sendEmail = internalAction({
       );
     }
 
-    // Test mode - log instead of sending
+    // Test mode — only allowed in non-production environments
     if (EMAIL_TEST_MODE === "true") {
+      if (process.env.NODE_ENV === "production") {
+        throw new Error(
+          "EMAIL_TEST_MODE must not be true in production. Check your environment variables.",
+        );
+      }
       console.log("📧 EMAIL TEST MODE - Would send:");
       console.log("To:", args.to);
       console.log("Subject:", args.subject);

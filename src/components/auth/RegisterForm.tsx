@@ -93,9 +93,7 @@ export function RegisterForm() {
         token: verificationToken,
       });
 
-      // In production, send verification email here
-      console.log("Verification token:", verificationToken);
-
+      // Verification email is triggered server-side via authActions
       setSuccess(true);
     } catch (err) {
       setErrors({

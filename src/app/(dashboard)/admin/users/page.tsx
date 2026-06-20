@@ -58,8 +58,11 @@ const ROLE_COLORS: Record<string, string> = {
 };
 
 export default function AdminUsersPage() {
-  const { user: currentUser } = useAuth();
-  const users = useQuery(api.users.listUsers, {}) as User[] | undefined;
+  const { user: currentUser, sessionToken } = useAuth();
+  const users = useQuery(
+    api.users.listUsers,
+    sessionToken ? { sessionToken } : "skip",
+  ) as User[] | undefined;
   const adminUpdate = useMutation(api.users.adminUpdateUser);
 
   const [search, setSearch] = useState("");
@@ -133,6 +136,7 @@ export default function AdminUsersPage() {
     setSaving(true);
     try {
       await adminUpdate({
+        sessionToken: sessionToken!,
         userId: editingUser.id,
         name: editForm.name || undefined,
         firstName: editForm.firstName || undefined,

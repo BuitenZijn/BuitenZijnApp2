@@ -37,10 +37,7 @@ const navItems: NavItem[] = [
   },
   {
     label: "Shop",
-    dropdown: [
-      { label: "Merch", href: "/shop/merch" },
-      { label: "Events", href: "/shop/events" },
-    ],
+    href: "/shop",
   },
   { label: "Contact", href: "/contact" },
 ];
@@ -188,11 +185,11 @@ export function Navbar() {
                       </p>
                     </div>
                     <Link
-                      href="/dashboard"
+                      href="/admin"
                       onClick={() => setUserMenuOpen(false)}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
-                      Dashboard
+                      Admin
                     </Link>
                     <button
                       onClick={handleLogout}

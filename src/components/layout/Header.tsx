@@ -15,7 +15,7 @@ import { clsx } from "clsx";
 
 /**
  * Header Component
- * 
+ *
  * Top header bar for the dashboard with user menu and notifications.
  */
 
@@ -36,7 +36,7 @@ export function Header() {
           <Bars3Icon className="w-6 h-6 text-gray-600" />
         </button>
         <h1 className="text-lg font-semibold text-gray-900 hidden sm:block">
-          Welkom terug{user?.firstName ? `, ${user.firstName}` : ""}!
+          Beheerpaneel{user?.firstName ? ` — ${user.firstName}` : ""}
         </h1>
       </div>
 
@@ -81,10 +81,10 @@ export function Header() {
               <Menu.Item>
                 {({ active }) => (
                   <a
-                    href="/dashboard/profile"
+                    href="/account"
                     className={clsx(
                       "flex items-center gap-2 px-4 py-2 text-sm",
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700"
+                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
                     )}
                   >
                     <UserIcon className="w-4 h-4" />
@@ -95,10 +95,10 @@ export function Header() {
               <Menu.Item>
                 {({ active }) => (
                   <a
-                    href="/dashboard/settings"
+                    href="/account"
                     className={clsx(
                       "flex items-center gap-2 px-4 py-2 text-sm",
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700"
+                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
                     )}
                   >
                     <Cog6ToothIcon className="w-4 h-4" />
@@ -113,7 +113,7 @@ export function Header() {
                     onClick={handleLogout}
                     className={clsx(
                       "flex items-center gap-2 px-4 py-2 text-sm w-full text-left",
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700"
+                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
                     )}
                   >
                     <ArrowRightOnRectangleIcon className="w-4 h-4" />

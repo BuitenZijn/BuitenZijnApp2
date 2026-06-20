@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin } from "./authUtils";
 
 // ==========================================
 // QUERIES
@@ -87,8 +88,9 @@ export const getCheckinCount = query({
  * Get attendees for a session (admin)
  */
 export const getAttendees = query({
-  args: { sessionId: v.id("linedance_sessions") },
+  args: { sessionToken: v.string(), sessionId: v.id("linedance_sessions") },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     const checkins = await ctx.db
       .query("linedance_checkins")
       .withIndex("by_sessionId", (q) => q.eq("sessionId", args.sessionId))
@@ -118,14 +120,11 @@ export const getAttendees = query({
 /**
  * Generate a random token for QR
  */
+/** Generate a cryptographically secure random QR token */
 function generateToken(): string {
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let result = "";
-  for (let i = 0; i < 32; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  return Array.from(array, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 /**
@@ -133,12 +132,14 @@ function generateToken(): string {
  */
 export const create = mutation({
   args: {
+    sessionToken: v.string(),
     date: v.string(),
     startTime: v.string(),
     endTime: v.string(),
     location: v.string(),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     const qrToken = generateToken();
 
     // QR expires at end of session day (23:59)
@@ -163,8 +164,9 @@ export const create = mutation({
  * Regenerate QR token for a session
  */
 export const regenerateQr = mutation({
-  args: { sessionId: v.id("linedance_sessions") },
+  args: { sessionToken: v.string(), sessionId: v.id("linedance_sessions") },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     const session = await ctx.db.get(args.sessionId);
     if (!session) throw new Error("Sessie niet gevonden");
 
@@ -184,8 +186,9 @@ export const regenerateQr = mutation({
  * Delete a session (only if no check-ins)
  */
 export const remove = mutation({
-  args: { sessionId: v.id("linedance_sessions") },
+  args: { sessionToken: v.string(), sessionId: v.id("linedance_sessions") },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.sessionToken);
     const checkins = await ctx.db
       .query("linedance_checkins")
       .withIndex("by_sessionId", (q) => q.eq("sessionId", args.sessionId))

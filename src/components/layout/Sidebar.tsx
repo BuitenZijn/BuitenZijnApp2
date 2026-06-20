@@ -6,17 +6,15 @@ import { clsx } from "clsx";
 import {
   HomeIcon,
   UserGroupIcon,
-  CalendarIcon,
-  Cog6ToothIcon,
   UserIcon,
   CreditCardIcon,
   TicketIcon,
   QrCodeIcon,
-  MusicalNoteIcon,
   CalculatorIcon,
   GlobeAltIcon,
   PuzzlePieceIcon,
   TrophyIcon,
+  ShoppingBagIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth } from "@/app/providers";
 
@@ -27,50 +25,43 @@ import { useAuth } from "@/app/providers";
  */
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
-  { name: "Leden", href: "/dashboard/members", icon: UserGroupIcon },
-  { name: "Activiteiten", href: "/dashboard/activities", icon: CalendarIcon },
-  { name: "Profiel", href: "/dashboard/profile", icon: UserIcon },
-  { name: "Instellingen", href: "/dashboard/settings", icon: Cog6ToothIcon },
-];
-
-const adminNavigation = [
-  { name: "Gebruikers", href: "/dashboard/admin/users", icon: UserGroupIcon },
+  { name: "Overzicht", href: "/admin", icon: HomeIcon },
+  { name: "Gebruikers", href: "/admin/users", icon: UserGroupIcon },
 ];
 
 const linedanceNavigation = [
   {
     name: "Danskrediet",
-    href: "/dashboard/admin/linedance/credits",
+    href: "/admin/linedance/credits",
     icon: CreditCardIcon,
   },
   {
     name: "Sessies",
-    href: "/dashboard/admin/linedance/sessions",
+    href: "/admin/linedance/sessions",
     icon: QrCodeIcon,
   },
 ];
 
 const ellaNavigation = [
-  { name: "Knutselen", href: "/dashboard/admin/ella", icon: TicketIcon },
+  { name: "Knutselen", href: "/admin/ella", icon: TicketIcon },
   {
     name: "Rekenen",
-    href: "/dashboard/admin/ella/rekenen",
+    href: "/admin/ella/rekenen",
     icon: CalculatorIcon,
   },
   {
     name: "Dinosaurussen",
-    href: "/dashboard/admin/ella/dinosaurussen",
+    href: "/admin/ella/dinosaurussen",
     icon: GlobeAltIcon,
   },
   {
     name: "Planeten",
-    href: "/dashboard/admin/ella/planeten",
+    href: "/admin/ella/planeten",
     icon: GlobeAltIcon,
   },
   {
     name: "Memory",
-    href: "/dashboard/admin/ella/memory",
+    href: "/admin/ella/memory",
     icon: PuzzlePieceIcon,
   },
 ];
@@ -78,7 +69,7 @@ const ellaNavigation = [
 const quizNavigation = [
   {
     name: "Quizzen",
-    href: "/dashboard/admin/quizzen",
+    href: "/admin/quizzen",
     icon: PuzzlePieceIcon,
   },
 ];
@@ -86,8 +77,16 @@ const quizNavigation = [
 const pronoNavigation = [
   {
     name: "Prono",
-    href: "/dashboard/admin/prono",
+    href: "/admin/prono",
     icon: TrophyIcon,
+  },
+];
+
+const shopNavigation = [
+  {
+    name: "Producten & Bestellingen",
+    href: "/admin/shop",
+    icon: ShoppingBagIcon,
   },
 ];
 
@@ -99,7 +98,7 @@ export function Sidebar() {
     <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
       {/* Logo */}
       <div className="h-16 flex items-center px-6 border-b border-gray-200">
-        <Link href="/dashboard" className="flex items-center gap-2">
+        <Link href="/admin" className="flex items-center gap-2">
           <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-lg">B</span>
           </div>
@@ -134,34 +133,6 @@ export function Sidebar() {
         {/* Admin section */}
         {user?.roles?.includes("admin") && (
           <>
-            <div className="pt-6">
-              <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Beheer
-              </h3>
-              <div className="mt-2 space-y-1">
-                {adminNavigation.map((item) => {
-                  const isActive =
-                    pathname === item.href ||
-                    pathname.startsWith(item.href + "/");
-                  return (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={clsx(
-                        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                        isActive
-                          ? "bg-blue-50 text-blue-700"
-                          : "text-gray-700 hover:bg-gray-100",
-                      )}
-                    >
-                      <item.icon className="w-5 h-5" />
-                      {item.name}
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-
             {/* Lijndans sub-section */}
             <div className="pt-4">
               <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -267,6 +238,35 @@ export function Sidebar() {
                         "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                         isActive
                           ? "bg-emerald-50 text-emerald-700"
+                          : "text-gray-700 hover:bg-gray-100",
+                      )}
+                    >
+                      <item.icon className="w-5 h-5" />
+                      {item.name}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Shop sub-section */}
+            <div className="pt-4">
+              <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                🛍️ Shop
+              </h3>
+              <div className="mt-2 space-y-1">
+                {shopNavigation.map((item) => {
+                  const isActive =
+                    pathname === item.href ||
+                    pathname.startsWith(item.href + "/");
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={clsx(
+                        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                        isActive
+                          ? "bg-amber-50 text-amber-700"
                           : "text-gray-700 hover:bg-gray-100",
                       )}
                     >

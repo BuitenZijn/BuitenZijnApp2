@@ -609,4 +609,75 @@ export default defineSchema({
     .index("by_competition", ["competitionId"])
     .index("by_competition_user", ["competitionId", "userId"])
     .index("by_competition_points", ["competitionId", "totalPoints"]),
+
+  // ==========================================
+  // SHOP: Product categories
+  // ==========================================
+  shop_categories: defineTable({
+    name: v.string(),
+    slug: v.string(),
+    description: v.optional(v.string()),
+    order: v.number(),
+    isActive: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_active", ["isActive"]),
+
+  // ==========================================
+  // SHOP: Products
+  // ==========================================
+  shop_products: defineTable({
+    name: v.string(),
+    slug: v.string(),
+    description: v.optional(v.string()),
+    priceInCents: v.number(),
+    categoryId: v.id("shop_categories"),
+    imageId: v.optional(v.id("_storage")),
+    stock: v.number(),
+    isActive: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_category", ["categoryId"])
+    .index("by_active", ["isActive"])
+    .index("by_createdAt", ["createdAt"]),
+
+  // ==========================================
+  // SHOP: Orders
+  // ==========================================
+  shop_orders: defineTable({
+    orderNumber: v.string(),
+    // Visitor info (no login required)
+    customerName: v.string(),
+    customerEmail: v.string(),
+    customerPhone: v.optional(v.string()),
+    // Optional logged-in user
+    userId: v.optional(v.id("users")),
+    // Order items snapshot
+    items: v.array(
+      v.object({
+        productId: v.id("shop_products"),
+        productName: v.string(),
+        quantity: v.number(),
+        priceInCents: v.number(),
+      }),
+    ),
+    totalInCents: v.number(),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("confirmed"),
+      v.literal("completed"),
+      v.literal("cancelled"),
+    ),
+    note: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_orderNumber", ["orderNumber"])
+    .index("by_customerEmail", ["customerEmail"])
+    .index("by_userId", ["userId"])
+    .index("by_status", ["status"])
+    .index("by_createdAt", ["createdAt"]),
 });

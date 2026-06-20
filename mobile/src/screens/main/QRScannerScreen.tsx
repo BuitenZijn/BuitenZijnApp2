@@ -22,7 +22,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 
 export default function QRScannerScreen() {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const navigation = useNavigation();
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
@@ -51,6 +51,7 @@ export default function QRScannerScreen() {
       const qrToken = data.trim();
 
       const response = await checkIn({
+        sessionToken: sessionToken!,
         userId: user._id,
         qrToken,
       });
