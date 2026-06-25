@@ -7,7 +7,7 @@ import { useAuth } from "@/app/providers";
 import { Id } from "../../../../../convex/_generated/dataModel";
 
 export default function AdminCreditsPage() {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [creditAmount, setCreditAmount] = useState(1);
   const [creditNote, setCreditNote] = useState("");
@@ -19,8 +19,14 @@ export default function AdminCreditsPage() {
     priceInCents: 600,
   });
 
-  const balances = useQuery(api.danceCredits.getAllBalances);
-  const purchases = useQuery(api.danceCredits.getAllPurchases, { limit: 100 });
+  const balances = useQuery(
+    api.danceCredits.getAllBalances,
+    sessionToken ? { sessionToken } : "skip",
+  );
+  const purchases = useQuery(
+    api.danceCredits.getAllPurchases,
+    sessionToken ? { sessionToken, limit: 100 } : "skip",
+  );
   const packages = useQuery(api.creditPackages.listAll);
 
   const addCredits = useMutation(api.danceCredits.addCredits);
@@ -42,12 +48,14 @@ export default function AdminCreditsPage() {
           credits: creditAmount,
           paymentMethod: "manual",
           note: creditNote || "Manueel toegevoegd door admin",
+          sessionToken: sessionToken!,
         });
       } else {
         await removeCredits({
           userId: selectedUserId as Id<"users">,
           credits: creditAmount,
           note: creditNote || "Verwijderd door admin",
+          sessionToken: sessionToken!,
         });
       }
       setSelectedUserId(null);
@@ -60,7 +68,7 @@ export default function AdminCreditsPage() {
 
   const handleCreatePackage = async () => {
     if (!newPkg.name || newPkg.credits < 1 || newPkg.priceInCents < 0) return;
-    await createPackage(newPkg);
+    await createPackage({ ...newPkg, sessionToken: sessionToken! });
     setNewPkg({ name: "", credits: 1, priceInCents: 600 });
     setShowPackageForm(false);
   };
@@ -69,6 +77,7 @@ export default function AdminCreditsPage() {
     await updatePackage({
       packageId: id as Id<"linedance_credit_packages">,
       isActive: !isActive,
+      sessionToken: sessionToken!,
     });
   };
 
@@ -471,4 +480,3 @@ export default function AdminCreditsPage() {
     </div>
   );
 }
-

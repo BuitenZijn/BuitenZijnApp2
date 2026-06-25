@@ -7,7 +7,7 @@ import { useAuth } from "@/app/providers";
 import { Id } from "../../../../../../convex/_generated/dataModel";
 
 export default function AdminSessionsPage() {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [year, setYear] = useState(now.getFullYear());
@@ -29,7 +29,7 @@ export default function AdminSessionsPage() {
   const attendees = useQuery(
     api.danceSessions.getAttendees,
     viewSessionId
-      ? { sessionId: viewSessionId as Id<"linedance_sessions"> }
+      ? { sessionId: viewSessionId as Id<"linedance_sessions">, sessionToken: sessionToken! }
       : "skip",
   );
 
@@ -46,7 +46,7 @@ export default function AdminSessionsPage() {
 
   const handleCreate = async () => {
     try {
-      await createSession(newSession);
+      await createSession({ ...newSession, sessionToken: sessionToken! });
       setShowCreate(false);
     } catch (err: any) {
       alert(err.message);
@@ -59,7 +59,7 @@ export default function AdminSessionsPage() {
     )
       return;
     try {
-      await removeSession({ sessionId: sessionId as Id<"linedance_sessions"> });
+      await removeSession({ sessionId: sessionId as Id<"linedance_sessions">, sessionToken: sessionToken! });
     } catch (err: any) {
       alert(err.message);
     }
@@ -70,6 +70,7 @@ export default function AdminSessionsPage() {
     try {
       await regenerateQr({
         sessionId: sessionId as Id<"linedance_sessions">,
+        sessionToken: sessionToken!,
       });
     } catch (err: any) {
       alert(err.message);

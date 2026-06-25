@@ -3,10 +3,10 @@
 import { useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../../../../../convex/_generated/api";
+import { api } from "../../../../../../convex/_generated/api";
 import { useAuth } from "@/app/providers";
 import { Card, CardContent } from "@/components/ui";
-import type { Id } from "../../../../../../../convex/_generated/dataModel";
+import type { Id } from "../../../../../../convex/_generated/dataModel";
 
 type QuestionType =
   | "multiple_choice"
@@ -73,7 +73,7 @@ const emptyQuestion: QuestionForm = {
 export default function DashboardQuizDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const quizId = params.id as Id<"quizzes">;
 
   const quiz = useQuery(api.quizzes.getQuiz, { id: quizId });
@@ -112,14 +112,14 @@ export default function DashboardQuizDetailPage() {
   const handleImageUpload = async (file: File, optionIndex: number) => {
     setUploadingIndex(optionIndex);
     try {
-      const uploadUrl = await generateUploadUrl();
+      const uploadUrl = await generateUploadUrl({ sessionToken: sessionToken! });
       const result = await fetch(uploadUrl, {
         method: "POST",
         headers: { "Content-Type": file.type },
         body: file,
       });
       const { storageId } = await result.json();
-      const url = await getStorageUrl({ storageId });
+      const url = await getStorageUrl({ storageId, sessionToken: sessionToken! });
       if (url) {
         const newUrls = [...form.optionImageUrls];
         newUrls[optionIndex] = url;
@@ -154,6 +154,7 @@ export default function DashboardQuizDetailPage() {
       title: quizTitle,
       description: quizDesc || undefined,
       isActive: quizActive,
+      sessionToken: sessionToken!,
     });
     setEditingQuiz(false);
   };
@@ -259,12 +260,14 @@ export default function DashboardQuizDetailPage() {
           ...data,
           order:
             questions?.find((q) => q._id === editingQuestionId)?.order ?? 0,
+          sessionToken: sessionToken!,
         });
       } else {
         await addQuestion({
           quizId,
           ...data,
           order: questions?.length ?? 0,
+          sessionToken: sessionToken!,
         });
       }
 
@@ -278,7 +281,7 @@ export default function DashboardQuizDetailPage() {
 
   const handleDeleteQuestion = async (id: Id<"quiz_questions">) => {
     if (!confirm("Vraag verwijderen?")) return;
-    await deleteQuestion({ id });
+    await deleteQuestion({ id, sessionToken: sessionToken! });
   };
 
   const cancelEdit = () => {
@@ -502,6 +505,7 @@ export default function DashboardQuizDetailPage() {
                             roundForm.roundType === "eliminatie"
                               ? roundForm.eliminateCount
                               : undefined,
+                          sessionToken: sessionToken!,
                         });
                       } else {
                         await addRound({
@@ -513,6 +517,7 @@ export default function DashboardQuizDetailPage() {
                             roundForm.roundType === "eliminatie"
                               ? roundForm.eliminateCount
                               : undefined,
+                          sessionToken: sessionToken!,
                         });
                       }
                       setRoundForm({ ...emptyRound });
@@ -604,7 +609,7 @@ export default function DashboardQuizDetailPage() {
                     <button
                       onClick={async () => {
                         if (!confirm("Ronde verwijderen?")) return;
-                        await deleteRoundMut({ id: r._id });
+                        await deleteRoundMut({ id: r._id, sessionToken: sessionToken! });
                       }}
                       className="px-2 py-1 text-red-600 hover:bg-red-50 rounded text-sm"
                     >

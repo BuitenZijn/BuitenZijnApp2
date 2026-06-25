@@ -73,7 +73,7 @@ const emptyQuestion: QuestionForm = {
 export default function QuizDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const quizId = params.id as Id<"quizzes">;
 
   const quiz = useQuery(api.quizzes.getQuiz, { id: quizId });
@@ -124,14 +124,14 @@ export default function QuizDetailPage() {
   const handleImageUpload = async (file: File, optionIndex: number) => {
     setUploadingIndex(optionIndex);
     try {
-      const uploadUrl = await generateUploadUrl();
+      const uploadUrl = await generateUploadUrl({ sessionToken: sessionToken! });
       const result = await fetch(uploadUrl, {
         method: "POST",
         headers: { "Content-Type": file.type },
         body: file,
       });
       const { storageId } = await result.json();
-      const url = await getStorageUrl({ storageId });
+      const url = await getStorageUrl({ storageId, sessionToken: sessionToken! });
       if (url) {
         const newUrls = [...form.optionImageUrls];
         newUrls[optionIndex] = url;
@@ -177,6 +177,7 @@ export default function QuizDetailPage() {
       scoringMode,
       linearMinMultiplier,
       tieredBrackets,
+      sessionToken: sessionToken!,
     });
     setEditingQuiz(false);
   };
@@ -286,12 +287,14 @@ export default function QuizDetailPage() {
           ...data,
           order:
             questions?.find((q) => q._id === editingQuestionId)?.order ?? 0,
+          sessionToken: sessionToken!,
         });
       } else {
         await addQuestion({
           quizId,
           ...data,
           order: questions?.length ?? 0,
+          sessionToken: sessionToken!,
         });
       }
 
@@ -305,7 +308,7 @@ export default function QuizDetailPage() {
 
   const handleDeleteQuestion = async (id: Id<"quiz_questions">) => {
     if (!confirm("Vraag verwijderen?")) return;
-    await deleteQuestion({ id });
+    await deleteQuestion({ id, sessionToken: sessionToken! });
   };
 
   const cancelEdit = () => {
@@ -695,6 +698,7 @@ export default function QuizDetailPage() {
                               roundForm.roundType === "eliminatie"
                                 ? roundForm.eliminateCount
                                 : undefined,
+                            sessionToken: sessionToken!,
                           });
                         } else {
                           await addRound({
@@ -706,6 +710,7 @@ export default function QuizDetailPage() {
                               roundForm.roundType === "eliminatie"
                                 ? roundForm.eliminateCount
                                 : undefined,
+                            sessionToken: sessionToken!,
                           });
                         }
                         setRoundForm({ ...emptyRound });
@@ -800,7 +805,7 @@ export default function QuizDetailPage() {
                       <button
                         onClick={async () => {
                           if (!confirm("Ronde verwijderen?")) return;
-                          await deleteRoundMut({ id: r._id });
+                          await deleteRoundMut({ id: r._id, sessionToken: sessionToken! });
                         }}
                         className="px-2 py-1 text-red-600 hover:bg-red-50 rounded text-sm"
                       >

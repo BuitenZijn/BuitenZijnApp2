@@ -9,7 +9,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
 import type { Id } from "../../../../../convex/_generated/dataModel";
 
 export default function AdminQuizzenPage() {
-  const { user } = useAuth();
+  const { user, sessionToken } = useAuth();
   const quizzes = useQuery(api.quizzes.listQuizzes);
   const createQuiz = useMutation(api.quizzes.createQuiz);
   const deleteQuiz = useMutation(api.quizzes.deleteQuiz);
@@ -33,6 +33,7 @@ export default function AdminQuizzenPage() {
         title: newTitle.trim(),
         description: newDescription.trim() || undefined,
         createdBy: user.id as Id<"users">,
+        sessionToken: sessionToken!,
       });
       setNewTitle("");
       setNewDescription("");
@@ -49,7 +50,7 @@ export default function AdminQuizzenPage() {
       )
     )
       return;
-    await deleteQuiz({ id });
+    await deleteQuiz({ id, sessionToken: sessionToken! });
   };
 
   const handleToggleActive = async (
@@ -60,6 +61,7 @@ export default function AdminQuizzenPage() {
       title: quiz.title,
       description: quiz.description,
       isActive: !quiz.isActive,
+      sessionToken: sessionToken!,
     });
   };
 
@@ -67,6 +69,7 @@ export default function AdminQuizzenPage() {
     const sessionId = await createSession({
       quizId,
       createdBy: user.id as Id<"users">,
+      sessionToken: sessionToken!,
     });
     window.location.href = `/activiteiten/quizzen/live/${sessionId}`;
   };
