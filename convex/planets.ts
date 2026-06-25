@@ -61,7 +61,7 @@ export const generateUploadUrl = mutation({
 });
 
 /**
- * Set/update the image for a planet
+ * Set/update the image for a planet x
  */
 export const setImage = mutation({
   args: {
