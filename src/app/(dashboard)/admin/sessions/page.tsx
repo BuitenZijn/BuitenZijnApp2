@@ -29,7 +29,10 @@ export default function AdminSessionsPage() {
   const attendees = useQuery(
     api.danceSessions.getAttendees,
     viewSessionId
-      ? { sessionId: viewSessionId as Id<"linedance_sessions">, sessionToken: sessionToken! }
+      ? {
+          sessionId: viewSessionId as Id<"linedance_sessions">,
+          sessionToken: sessionToken!,
+        }
       : "skip",
   );
 
@@ -59,7 +62,10 @@ export default function AdminSessionsPage() {
     )
       return;
     try {
-      await removeSession({ sessionId: sessionId as Id<"linedance_sessions">, sessionToken: sessionToken! });
+      await removeSession({
+        sessionId: sessionId as Id<"linedance_sessions">,
+        sessionToken: sessionToken!,
+      });
     } catch (err: any) {
       alert(err.message);
     }
@@ -326,4 +332,3 @@ export default function AdminSessionsPage() {
     </div>
   );
 }
-

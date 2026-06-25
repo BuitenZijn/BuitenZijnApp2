@@ -124,14 +124,19 @@ export default function QuizDetailPage() {
   const handleImageUpload = async (file: File, optionIndex: number) => {
     setUploadingIndex(optionIndex);
     try {
-      const uploadUrl = await generateUploadUrl({ sessionToken: sessionToken! });
+      const uploadUrl = await generateUploadUrl({
+        sessionToken: sessionToken!,
+      });
       const result = await fetch(uploadUrl, {
         method: "POST",
         headers: { "Content-Type": file.type },
         body: file,
       });
       const { storageId } = await result.json();
-      const url = await getStorageUrl({ storageId, sessionToken: sessionToken! });
+      const url = await getStorageUrl({
+        storageId,
+        sessionToken: sessionToken!,
+      });
       if (url) {
         const newUrls = [...form.optionImageUrls];
         newUrls[optionIndex] = url;
@@ -805,7 +810,10 @@ export default function QuizDetailPage() {
                       <button
                         onClick={async () => {
                           if (!confirm("Ronde verwijderen?")) return;
-                          await deleteRoundMut({ id: r._id, sessionToken: sessionToken! });
+                          await deleteRoundMut({
+                            id: r._id,
+                            sessionToken: sessionToken!,
+                          });
                         }}
                         className="px-2 py-1 text-red-600 hover:bg-red-50 rounded text-sm"
                       >
